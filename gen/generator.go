@@ -22,6 +22,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -471,6 +472,57 @@ func hasAttributeVersionDifferences(attributes []YamlConfigAttribute) bool {
 	return false
 }
 
+// VersionChangesData is the JSON structure written to gen/version_changes_data.json.
+// It maps snake_case resource name → its added/removed attribute lists.
+type VersionChangesData map[string]ResourceVersionChanges
+
+type ResourceVersionChanges struct {
+	Removed []VersionedAttrRow `json:"removed"`
+}
+
+func writeVersionChangesData(configs []YamlConfig) {
+	data := make(VersionChangesData)
+	for _, cfg := range configs {
+		removed := CollectRemovedAttrs(cfg.Attributes, "")
+		if len(removed) > 0 {
+			data[SnakeCase(cfg.Name)] = ResourceVersionChanges{Removed: removed}
+		}
+	}
+	b, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		log.Fatalf("Error marshalling version changes data: %v", err)
+	}
+	if err := os.WriteFile("./gen/version_changes_data.json", b, 0644); err != nil {
+		log.Fatalf("Error writing version_changes_data.json: %v", err)
+	}
+}
+
+// VersionedAttrRow holds one row of the version compatibility table in generated docs.
+type VersionedAttrRow struct {
+	TfName    string `json:"tf_name"`
+	RemovedIn string `json:"removed_in,omitempty"`
+}
+
+
+// CollectRemovedAttrs recursively collects attributes that have RemovedInVersion set, sorted by name.
+func CollectRemovedAttrs(attrs []YamlConfigAttribute, prefix string) []VersionedAttrRow {
+	var rows []VersionedAttrRow
+	for _, attr := range attrs {
+		name := attr.TfName
+		if prefix != "" {
+			name = prefix + "." + attr.TfName
+		}
+		if attr.RemovedInVersion != "" {
+			rows = append(rows, VersionedAttrRow{TfName: name, RemovedIn: attr.RemovedInVersion})
+		}
+		if len(attr.Attributes) > 0 {
+			rows = append(rows, CollectRemovedAttrs(attr.Attributes, name)...)
+		}
+	}
+	sort.Slice(rows, func(i, j int) bool { return rows[i].TfName < rows[j].TfName })
+	return rows
+}
+
 // FormatVersionDisplay formats a version string for display.
 // New dotted format ("25.2", "24.4") is returned as-is.
 // Legacy 4-digit compact format ("2512") is converted to "MM.mm" (patch dropped).
@@ -870,6 +922,7 @@ var functions = template.FuncMap{
 	"formatVersionDefaults":                 FormatVersionDefaults,
 	"hasVersionDefaults":                    HasVersionDefaults,
 	"hasVersionDefaultsRecursive":           HasVersionDefaultsRecursive,
+	"collectRemovedAttrs":                   CollectRemovedAttrs,
 }
 
 func resolvePath(e *yang.Entry, path string) *yang.Entry {
@@ -1873,6 +1926,9 @@ func main() {
 		log.Fatalf("Error writing supported_versions_gen.go: %v", err)
 	}
 	log.Println("Generated internal/provider/helpers/supported_versions_gen.go")
+
+	// Write version changes data for doc_version_changes.go to consume
+	writeVersionChangesData(allConfigs)
 
 	log.Printf("\nGeneration complete! Processed %d resource(s) across all versions.", len(allConfigs))
 }

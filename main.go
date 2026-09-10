@@ -47,6 +47,9 @@ import (
 // Update documentation categories.
 //go:generate go run gen/doc_category.go
 
+// Inject Version Compatibility sections into resource docs.
+//go:generate go run gen/doc_version_changes.go
+
 func main() {
 	opts := providerserver.ServeOpts{
 		Address: "registry.terraform.io/CiscoDevNet/iosxr",

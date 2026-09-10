@@ -22,6 +22,7 @@ gen:
 	terraform fmt -recursive ./examples/
 	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
 	go run gen/doc_category.go
+	go run gen/doc_version_changes.go
 
 # Update all files
 .PHONY: genall
@@ -32,6 +33,7 @@ genall:
 	terraform fmt -recursive ./examples/
 	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
 	go run gen/doc_category.go
+	go run gen/doc_version_changes.go
 
 # Run unit tests (no device required)
 .PHONY: test-unit

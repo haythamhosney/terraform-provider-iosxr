@@ -124,31 +124,37 @@ attributes:
   ## monitor: leaf→container restructure ##
   - yang_name: monitor/discriminator/match1
     tf_name: monitor_discriminator_match1
+    replaces_yang_name: monitor-discriminator/match1
     description: "Set match discriminator 1"
     type: String
     example: MATCH1
   - yang_name: monitor/discriminator/match2
     tf_name: monitor_discriminator_match2
+    replaces_yang_name: monitor-discriminator/match2
     description: "Set match discriminator 2"
     type: String
     example: MATCH2
   - yang_name: monitor/discriminator/match3
     tf_name: monitor_discriminator_match3
+    replaces_yang_name: monitor-discriminator/match3
     description: "Set match discriminator 3"
     type: String
     example: MATCH3
   - yang_name: monitor/discriminator/nomatch1
     tf_name: monitor_discriminator_nomatch1
+    replaces_yang_name: monitor-discriminator/nomatch1
     description: "Set no-match discriminator 1"
     type: String
     example: NOMATCH1
   - yang_name: monitor/discriminator/nomatch2
     tf_name: monitor_discriminator_nomatch2
+    replaces_yang_name: monitor-discriminator/nomatch2
     description: "Set no-match discriminator 2"
     type: String
     example: NOMATCH2
   - yang_name: monitor/discriminator/nomatch3
     tf_name: monitor_discriminator_nomatch3
+    replaces_yang_name: monitor-discriminator/nomatch3
     description: "Set no-match discriminator 3"
     type: String
     example: NOMATCH3
@@ -175,12 +181,14 @@ attributes:
     attributes:
       - yang_name: path/local-accounting
         tf_name: local_accounting
+        replaces_yang_name: local-accounting
         type: Bool
         type_yang_bool: presence
         # exclude_test: true
         example: true
       - yang_name: path/local-accounting/send-to-remote
         tf_name: send_to_remote
+        replaces_yang_name: local-accounting/send-to-remote
         type: Bool
         type_yang_bool: presence
         # exclude_test: true
@@ -323,18 +331,6 @@ attributes:
   - yang_name: ipv6/dscp
     legacy: true
   - yang_name: ipv6/precedence
-    legacy: true
-  - yang_name: monitor-discriminator/match1
-    legacy: true
-  - yang_name: monitor-discriminator/match2
-    legacy: true
-  - yang_name: monitor-discriminator/match3
-    legacy: true
-  - yang_name: monitor-discriminator/nomatch1
-    legacy: true
-  - yang_name: monitor-discriminator/nomatch2
-    legacy: true
-  - yang_name: monitor-discriminator/nomatch3
     legacy: true
   - yang_name: suppress/duplicates
     legacy: true

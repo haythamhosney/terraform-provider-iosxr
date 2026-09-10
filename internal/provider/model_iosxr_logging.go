@@ -172,6 +172,8 @@ type LoggingFile struct {
 	Path                                     types.String `tfsdk:"path"`
 	Maxfilesize                              types.Int64  `tfsdk:"maxfilesize"`
 	Severity                                 types.String `tfsdk:"severity"`
+	LocalAccounting                          types.Bool   `tfsdk:"local_accounting"`
+	SendToRemote                             types.Bool   `tfsdk:"send_to_remote"`
 	LocalAccountingSendToRemoteFacilityLevel types.String `tfsdk:"local_accounting_send_to_remote_facility_level"`
 	DiscriminatorMatch1                      types.String `tfsdk:"discriminator_match1"`
 	DiscriminatorMatch2                      types.String `tfsdk:"discriminator_match2"`
@@ -179,8 +181,6 @@ type LoggingFile struct {
 	DiscriminatorNomatch1                    types.String `tfsdk:"discriminator_nomatch1"`
 	DiscriminatorNomatch2                    types.String `tfsdk:"discriminator_nomatch2"`
 	DiscriminatorNomatch3                    types.String `tfsdk:"discriminator_nomatch3"`
-	LocalAccounting                          types.Bool   `tfsdk:"local_accounting"`
-	SendToRemote                             types.Bool   `tfsdk:"send_to_remote"`
 	SendToRemoteFacility                     types.String `tfsdk:"send_to_remote_facility"`
 }
 type LoggingSourceInterfaces struct {
@@ -243,35 +243,23 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 			body, _ = sjson.Set(body, "console-logging.console-log-facility.console-facility-level", data.ConsoleFacility.ValueString())
 		}
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.MonitorDiscriminatorMatch1.IsNull() && !data.MonitorDiscriminatorMatch1.IsUnknown() {
-			body, _ = sjson.Set(body, "monitor.discriminator.match1", data.MonitorDiscriminatorMatch1.ValueString())
-		}
+	if !data.MonitorDiscriminatorMatch1.IsNull() && !data.MonitorDiscriminatorMatch1.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4"), data.MonitorDiscriminatorMatch1.ValueString())
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.MonitorDiscriminatorMatch2.IsNull() && !data.MonitorDiscriminatorMatch2.IsUnknown() {
-			body, _ = sjson.Set(body, "monitor.discriminator.match2", data.MonitorDiscriminatorMatch2.ValueString())
-		}
+	if !data.MonitorDiscriminatorMatch2.IsNull() && !data.MonitorDiscriminatorMatch2.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.match2", "monitor-discriminator.match2", "25.4"), data.MonitorDiscriminatorMatch2.ValueString())
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.MonitorDiscriminatorMatch3.IsNull() && !data.MonitorDiscriminatorMatch3.IsUnknown() {
-			body, _ = sjson.Set(body, "monitor.discriminator.match3", data.MonitorDiscriminatorMatch3.ValueString())
-		}
+	if !data.MonitorDiscriminatorMatch3.IsNull() && !data.MonitorDiscriminatorMatch3.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.match3", "monitor-discriminator.match3", "25.4"), data.MonitorDiscriminatorMatch3.ValueString())
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.MonitorDiscriminatorNomatch1.IsNull() && !data.MonitorDiscriminatorNomatch1.IsUnknown() {
-			body, _ = sjson.Set(body, "monitor.discriminator.nomatch1", data.MonitorDiscriminatorNomatch1.ValueString())
-		}
+	if !data.MonitorDiscriminatorNomatch1.IsNull() && !data.MonitorDiscriminatorNomatch1.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.nomatch1", "monitor-discriminator.nomatch1", "25.4"), data.MonitorDiscriminatorNomatch1.ValueString())
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.MonitorDiscriminatorNomatch2.IsNull() && !data.MonitorDiscriminatorNomatch2.IsUnknown() {
-			body, _ = sjson.Set(body, "monitor.discriminator.nomatch2", data.MonitorDiscriminatorNomatch2.ValueString())
-		}
+	if !data.MonitorDiscriminatorNomatch2.IsNull() && !data.MonitorDiscriminatorNomatch2.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.nomatch2", "monitor-discriminator.nomatch2", "25.4"), data.MonitorDiscriminatorNomatch2.ValueString())
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.MonitorDiscriminatorNomatch3.IsNull() && !data.MonitorDiscriminatorNomatch3.IsUnknown() {
-			body, _ = sjson.Set(body, "monitor.discriminator.nomatch3", data.MonitorDiscriminatorNomatch3.ValueString())
-		}
+	if !data.MonitorDiscriminatorNomatch3.IsNull() && !data.MonitorDiscriminatorNomatch3.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.nomatch3", "monitor-discriminator.nomatch3", "25.4"), data.MonitorDiscriminatorNomatch3.ValueString())
 	}
 	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
 		if !data.ArchiveDisk0.IsNull() && !data.ArchiveDisk0.IsUnknown() {
@@ -519,6 +507,16 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 			if !item.Severity.IsNull() && !item.Severity.IsUnknown() {
 				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.severity", "severity", "25.4"), item.Severity.ValueString())
 			}
+			if !item.LocalAccounting.IsNull() && !item.LocalAccounting.IsUnknown() {
+				if item.LocalAccounting.ValueBool() {
+					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.local-accounting", "local-accounting", "25.4"), map[string]string{})
+				}
+			}
+			if !item.SendToRemote.IsNull() && !item.SendToRemote.IsUnknown() {
+				if item.SendToRemote.ValueBool() {
+					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4"), map[string]string{})
+				}
+			}
 			if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
 				if !item.LocalAccountingSendToRemoteFacilityLevel.IsNull() && !item.LocalAccountingSendToRemoteFacilityLevel.IsUnknown() {
 					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"local-accounting.send-to-remote.facility.level", item.LocalAccountingSendToRemoteFacilityLevel.ValueString())
@@ -541,20 +539,6 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 			}
 			if !item.DiscriminatorNomatch3.IsNull() && !item.DiscriminatorNomatch3.IsUnknown() {
 				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"discriminator.nomatch3", item.DiscriminatorNomatch3.ValueString())
-			}
-			if helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.LocalAccounting.IsNull() && !item.LocalAccounting.IsUnknown() {
-					if item.LocalAccounting.ValueBool() {
-						body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path.local-accounting", map[string]string{})
-					}
-				}
-			}
-			if helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.SendToRemote.IsNull() && !item.SendToRemote.IsUnknown() {
-					if item.SendToRemote.ValueBool() {
-						body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path.local-accounting.send-to-remote", map[string]string{})
-					}
-				}
 			}
 			if helpers.VersionAtLeast(providerVersion, "25.4") {
 				if !item.SendToRemoteFacility.IsNull() && !item.SendToRemoteFacility.IsUnknown() {
@@ -653,36 +637,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 	constraints = append(constraints, []helpers.FieldVersionConstraint{
 		{
 			FieldPath: "console_facility",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "monitor_discriminator_match1",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "monitor_discriminator_match2",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "monitor_discriminator_match3",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "monitor_discriminator_nomatch1",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "monitor_discriminator_nomatch2",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "monitor_discriminator_nomatch3",
 
 			RemovedInVersion: "25.4",
 		},
@@ -805,14 +759,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 			FieldPath: "file.local_accounting_send_to_remote_facility_level",
 
 			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath:      "file.local_accounting",
-			AddedInVersion: "25.4",
-		},
-		{
-			FieldPath:      "file.send_to_remote",
-			AddedInVersion: "25.4",
 		},
 		{
 			FieldPath:      "file.send_to_remote_facility",
@@ -970,32 +916,32 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 	} else {
 		data.ConsoleFacility = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "monitor.discriminator.match1"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch1.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch1.IsNull() {
 		data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorMatch1 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "monitor.discriminator.match2"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch2.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match2", "monitor-discriminator.match2", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch2.IsNull() {
 		data.MonitorDiscriminatorMatch2 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorMatch2 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "monitor.discriminator.match3"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch3.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match3", "monitor-discriminator.match3", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch3.IsNull() {
 		data.MonitorDiscriminatorMatch3 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorMatch3 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "monitor.discriminator.nomatch1"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch1.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch1", "monitor-discriminator.nomatch1", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch1.IsNull() {
 		data.MonitorDiscriminatorNomatch1 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorNomatch1 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "monitor.discriminator.nomatch2"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch2.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch2", "monitor-discriminator.nomatch2", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch2.IsNull() {
 		data.MonitorDiscriminatorNomatch2 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorNomatch2 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "monitor.discriminator.nomatch3"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch3.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch3", "monitor-discriminator.nomatch3", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch3.IsNull() {
 		data.MonitorDiscriminatorNomatch3 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorNomatch3 = types.StringNull()
@@ -1201,6 +1147,24 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 		} else {
 			data.File[i].Severity = types.StringNull()
 		}
+		if value := r.Get(helpers.SelectYangPath(version, "path.local-accounting", "local-accounting", "25.4")); !data.File[i].LocalAccounting.IsNull() {
+			if value.Exists() {
+				data.File[i].LocalAccounting = types.BoolValue(true)
+			} else {
+				data.File[i].LocalAccounting = types.BoolValue(false)
+			}
+		} else {
+			data.File[i].LocalAccounting = types.BoolNull()
+		}
+		if value := r.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); !data.File[i].SendToRemote.IsNull() {
+			if value.Exists() {
+				data.File[i].SendToRemote = types.BoolValue(true)
+			} else {
+				data.File[i].SendToRemote = types.BoolValue(false)
+			}
+		} else {
+			data.File[i].SendToRemote = types.BoolNull()
+		}
 		if value := r.Get("local-accounting.send-to-remote.facility.level"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
 			data.File[i].LocalAccountingSendToRemoteFacilityLevel = types.StringValue(value.String())
 		} else {
@@ -1235,24 +1199,6 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 			data.File[i].DiscriminatorNomatch3 = types.StringValue(value.String())
 		} else {
 			data.File[i].DiscriminatorNomatch3 = types.StringNull()
-		}
-		if value := r.Get("path.local-accounting"); helpers.VersionAtLeast(version, "25.4") && !data.File[i].LocalAccounting.IsNull() {
-			if value.Exists() {
-				data.File[i].LocalAccounting = types.BoolValue(true)
-			} else {
-				data.File[i].LocalAccounting = types.BoolValue(false)
-			}
-		} else {
-			data.File[i].LocalAccounting = types.BoolNull()
-		}
-		if value := r.Get("path.local-accounting.send-to-remote"); helpers.VersionAtLeast(version, "25.4") && !data.File[i].SendToRemote.IsNull() {
-			if value.Exists() {
-				data.File[i].SendToRemote = types.BoolValue(true)
-			} else {
-				data.File[i].SendToRemote = types.BoolValue(false)
-			}
-		} else {
-			data.File[i].SendToRemote = types.BoolNull()
 		}
 		if value := r.Get("path.local-accounting.send-to-remote.facility"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.File[i].SendToRemoteFacility.IsNull() {
 			data.File[i].SendToRemoteFacility = types.StringValue(value.String())
@@ -1628,47 +1574,23 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 	} else {
 		data.ConsoleFacility = types.StringNull()
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.match1"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorMatch1 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.match2"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorMatch2 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorMatch2 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match2", "monitor-discriminator.match2", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorMatch2 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.match3"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorMatch3 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorMatch3 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match3", "monitor-discriminator.match3", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorMatch3 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.nomatch1"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorNomatch1 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorNomatch1 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch1", "monitor-discriminator.nomatch1", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorNomatch1 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.nomatch2"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorNomatch2 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorNomatch2 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch2", "monitor-discriminator.nomatch2", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorNomatch2 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.nomatch3"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorNomatch3 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorNomatch3 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch3", "monitor-discriminator.nomatch3", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorNomatch3 = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 		if value := gjson.GetBytes(res, "archive.device.disk0"); value.Exists() {
@@ -1870,6 +1792,16 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 			if cValue := v.Get(helpers.SelectYangPath(version, "path.severity", "severity", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
 				item.Severity = types.StringValue(cValue.String())
 			}
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting", "local-accounting", "25.4")); cValue.Exists() {
+				item.LocalAccounting = types.BoolValue(true)
+			} else {
+				item.LocalAccounting = types.BoolValue(false)
+			}
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); cValue.Exists() {
+				item.SendToRemote = types.BoolValue(true)
+			} else {
+				item.SendToRemote = types.BoolValue(false)
+			}
 			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 				if cValue := v.Get("local-accounting.send-to-remote.facility.level"); cValue.Exists() && cValue.Type == gjson.String {
 					item.LocalAccountingSendToRemoteFacilityLevel = types.StringValue(cValue.String())
@@ -1894,24 +1826,6 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 			}
 			if cValue := v.Get("discriminator.nomatch3"); cValue.Exists() && cValue.Type == gjson.String {
 				item.DiscriminatorNomatch3 = types.StringValue(cValue.String())
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.local-accounting"); cValue.Exists() {
-					item.LocalAccounting = types.BoolValue(true)
-				} else {
-					item.LocalAccounting = types.BoolValue(false)
-				}
-			} else {
-				item.LocalAccounting = types.BoolNull()
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.local-accounting.send-to-remote"); cValue.Exists() {
-					item.SendToRemote = types.BoolValue(true)
-				} else {
-					item.SendToRemote = types.BoolValue(false)
-				}
-			} else {
-				item.SendToRemote = types.BoolNull()
 			}
 			if helpers.VersionAtLeast(version, "25.4") {
 				if cValue := v.Get("path.local-accounting.send-to-remote.facility"); cValue.Exists() && cValue.Type == gjson.String {
@@ -2162,47 +2076,23 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 	} else {
 		data.ConsoleFacility = types.StringNull()
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.match1"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorMatch1 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.match2"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorMatch2 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorMatch2 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match2", "monitor-discriminator.match2", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorMatch2 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.match3"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorMatch3 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorMatch3 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match3", "monitor-discriminator.match3", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorMatch3 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.nomatch1"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorNomatch1 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorNomatch1 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch1", "monitor-discriminator.nomatch1", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorNomatch1 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.nomatch2"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorNomatch2 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorNomatch2 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch2", "monitor-discriminator.nomatch2", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorNomatch2 = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.discriminator.nomatch3"); value.Exists() && value.Type == gjson.String {
-			data.MonitorDiscriminatorNomatch3 = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorDiscriminatorNomatch3 = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch3", "monitor-discriminator.nomatch3", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.MonitorDiscriminatorNomatch3 = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 		if value := gjson.GetBytes(res, "archive.device.disk0"); value.Exists() {
@@ -2404,6 +2294,16 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 			if cValue := v.Get(helpers.SelectYangPath(version, "path.severity", "severity", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
 				item.Severity = types.StringValue(cValue.String())
 			}
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting", "local-accounting", "25.4")); cValue.Exists() {
+				item.LocalAccounting = types.BoolValue(true)
+			} else {
+				item.LocalAccounting = types.BoolValue(false)
+			}
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); cValue.Exists() {
+				item.SendToRemote = types.BoolValue(true)
+			} else {
+				item.SendToRemote = types.BoolValue(false)
+			}
 			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 				if cValue := v.Get("local-accounting.send-to-remote.facility.level"); cValue.Exists() && cValue.Type == gjson.String {
 					item.LocalAccountingSendToRemoteFacilityLevel = types.StringValue(cValue.String())
@@ -2428,24 +2328,6 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 			}
 			if cValue := v.Get("discriminator.nomatch3"); cValue.Exists() && cValue.Type == gjson.String {
 				item.DiscriminatorNomatch3 = types.StringValue(cValue.String())
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.local-accounting"); cValue.Exists() {
-					item.LocalAccounting = types.BoolValue(true)
-				} else {
-					item.LocalAccounting = types.BoolValue(false)
-				}
-			} else {
-				item.LocalAccounting = types.BoolNull()
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.local-accounting.send-to-remote"); cValue.Exists() {
-					item.SendToRemote = types.BoolValue(true)
-				} else {
-					item.SendToRemote = types.BoolValue(false)
-				}
-			} else {
-				item.SendToRemote = types.BoolNull()
 			}
 			if helpers.VersionAtLeast(version, "25.4") {
 				if cValue := v.Get("path.local-accounting.send-to-remote.facility"); cValue.Exists() && cValue.Type == gjson.String {
@@ -2994,12 +2876,6 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 				if helpers.VersionAtLeast(version, "25.4") && !state.File[i].SendToRemoteFacility.IsNull() && data.File[j].SendToRemoteFacility.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote/facility", state.getPath(), keyString))
 				}
-				if helpers.VersionAtLeast(version, "25.4") && !state.File[i].SendToRemote.IsNull() && data.File[j].SendToRemote.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote", state.getPath(), keyString))
-				}
-				if helpers.VersionAtLeast(version, "25.4") && !state.File[i].LocalAccounting.IsNull() && data.File[j].LocalAccounting.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting", state.getPath(), keyString))
-				}
 				if !state.File[i].DiscriminatorNomatch3.IsNull() && data.File[j].DiscriminatorNomatch3.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/discriminator/nomatch3", state.getPath(), keyString))
 				}
@@ -3020,6 +2896,12 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 				}
 				if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() && data.File[j].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/local-accounting/send-to-remote/facility/level", state.getPath(), keyString))
+				}
+				if !state.File[i].SendToRemote.IsNull() && data.File[j].SendToRemote.IsNull() {
+					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote", state.getPath(), keyString))
+				}
+				if !state.File[i].LocalAccounting.IsNull() && data.File[j].LocalAccounting.IsNull() {
+					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting", state.getPath(), keyString))
 				}
 				if !state.File[i].Severity.IsNull() && data.File[j].Severity.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path", state.getPath(), keyString))
@@ -3115,22 +2997,22 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.ArchiveDisk0.IsNull() && data.ArchiveDisk0.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/archive/device/disk0", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.MonitorDiscriminatorNomatch3.IsNull() && data.MonitorDiscriminatorNomatch3.IsNull() {
+	if !state.MonitorDiscriminatorNomatch3.IsNull() && data.MonitorDiscriminatorNomatch3.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/discriminator/nomatch3", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.MonitorDiscriminatorNomatch2.IsNull() && data.MonitorDiscriminatorNomatch2.IsNull() {
+	if !state.MonitorDiscriminatorNomatch2.IsNull() && data.MonitorDiscriminatorNomatch2.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/discriminator/nomatch2", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.MonitorDiscriminatorNomatch1.IsNull() && data.MonitorDiscriminatorNomatch1.IsNull() {
+	if !state.MonitorDiscriminatorNomatch1.IsNull() && data.MonitorDiscriminatorNomatch1.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/discriminator/nomatch1", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.MonitorDiscriminatorMatch3.IsNull() && data.MonitorDiscriminatorMatch3.IsNull() {
+	if !state.MonitorDiscriminatorMatch3.IsNull() && data.MonitorDiscriminatorMatch3.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/discriminator/match3", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.MonitorDiscriminatorMatch2.IsNull() && data.MonitorDiscriminatorMatch2.IsNull() {
+	if !state.MonitorDiscriminatorMatch2.IsNull() && data.MonitorDiscriminatorMatch2.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/discriminator/match2", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.MonitorDiscriminatorMatch1.IsNull() && data.MonitorDiscriminatorMatch1.IsNull() {
+	if !state.MonitorDiscriminatorMatch1.IsNull() && data.MonitorDiscriminatorMatch1.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/discriminator/match1", state.getPath()))
 	}
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.ConsoleFacility.IsNull() && data.ConsoleFacility.IsNull() {
@@ -3241,10 +3123,10 @@ func (data *Logging) getEmptyLeafsDelete(ctx context.Context, version string) []
 		for ki := range keys {
 			keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
 		}
-		if helpers.VersionAtLeast(version, "25.4") && !data.File[i].SendToRemote.IsNull() && !data.File[i].SendToRemote.ValueBool() {
+		if !data.File[i].SendToRemote.IsNull() && !data.File[i].SendToRemote.ValueBool() {
 			emptyLeafsDelete = append(emptyLeafsDelete, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote", data.getPath(), keyString))
 		}
-		if helpers.VersionAtLeast(version, "25.4") && !data.File[i].LocalAccounting.IsNull() && !data.File[i].LocalAccounting.ValueBool() {
+		if !data.File[i].LocalAccounting.IsNull() && !data.File[i].LocalAccounting.ValueBool() {
 			emptyLeafsDelete = append(emptyLeafsDelete, fmt.Sprintf("%v/files/file%v/path/local-accounting", data.getPath(), keyString))
 		}
 	}
@@ -3508,22 +3390,22 @@ func (data *Logging) getDeletePaths(ctx context.Context, version string) []strin
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.ArchiveDisk0.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/archive/device/disk0", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.MonitorDiscriminatorNomatch3.IsNull() {
+	if !data.MonitorDiscriminatorNomatch3.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/discriminator/nomatch3", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.MonitorDiscriminatorNomatch2.IsNull() {
+	if !data.MonitorDiscriminatorNomatch2.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/discriminator/nomatch2", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.MonitorDiscriminatorNomatch1.IsNull() {
+	if !data.MonitorDiscriminatorNomatch1.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/discriminator/nomatch1", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.MonitorDiscriminatorMatch3.IsNull() {
+	if !data.MonitorDiscriminatorMatch3.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/discriminator/match3", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.MonitorDiscriminatorMatch2.IsNull() {
+	if !data.MonitorDiscriminatorMatch2.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/discriminator/match2", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.MonitorDiscriminatorMatch1.IsNull() {
+	if !data.MonitorDiscriminatorMatch1.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/discriminator/match1", data.getPath()))
 	}
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.ConsoleFacility.IsNull() {

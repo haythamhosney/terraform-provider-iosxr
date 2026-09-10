@@ -30,6 +30,8 @@ resource "iosxr_logging" "example" {
       path                                           = "/disk0:"
       maxfilesize                                    = 1024
       severity                                       = "informational"
+      local_accounting                               = true
+      send_to_remote                                 = true
       local_accounting_send_to_remote_facility_level = "local0"
       discriminator_match1                           = "MATCH1"
       discriminator_match2                           = "MATCH2"
@@ -37,8 +39,6 @@ resource "iosxr_logging" "example" {
       discriminator_nomatch1                         = "NOMATCH1"
       discriminator_nomatch2                         = "NOMATCH2"
       discriminator_nomatch3                         = "NOMATCH3"
-      local_accounting                               = true
-      send_to_remote                                 = true
       send_to_remote_facility                        = "auth"
     }
   ]

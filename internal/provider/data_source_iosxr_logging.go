@@ -232,6 +232,14 @@ func (d *LoggingDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 							MarkdownDescription: "severity",
 							Computed:            true,
 						},
+						"local_accounting": schema.BoolAttribute{
+							MarkdownDescription: "Store only the command accounting logs",
+							Computed:            true,
+						},
+						"send_to_remote": schema.BoolAttribute{
+							MarkdownDescription: "Send the command accounting logs to syslog server",
+							Computed:            true,
+						},
 						"local_accounting_send_to_remote_facility_level": schema.StringAttribute{
 							MarkdownDescription: "configure this node",
 							Computed:            true,
@@ -258,14 +266,6 @@ func (d *LoggingDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 						},
 						"discriminator_nomatch3": schema.StringAttribute{
 							MarkdownDescription: "Set no-match discriminator 3",
-							Computed:            true,
-						},
-						"local_accounting": schema.BoolAttribute{
-							MarkdownDescription: "Store only the command accounting logs",
-							Computed:            true,
-						},
-						"send_to_remote": schema.BoolAttribute{
-							MarkdownDescription: "Send the command accounting logs to syslog server",
 							Computed:            true,
 						},
 						"send_to_remote_facility": schema.StringAttribute{

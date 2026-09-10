@@ -108,7 +108,7 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 			},
 			"monitor_discriminator_match1": schema.StringAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("Set match discriminator 1").String + "\n  - **Not supported from version `25.4` and above**",
+				MarkdownDescription: helpers.NewAttributeDescription("Set match discriminator 1").String,
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(1, 32),
@@ -116,7 +116,7 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 			},
 			"monitor_discriminator_match2": schema.StringAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("Set match discriminator 2").String + "\n  - **Not supported from version `25.4` and above**",
+				MarkdownDescription: helpers.NewAttributeDescription("Set match discriminator 2").String,
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(1, 32),
@@ -124,7 +124,7 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 			},
 			"monitor_discriminator_match3": schema.StringAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("Set match discriminator 3").String + "\n  - **Not supported from version `25.4` and above**",
+				MarkdownDescription: helpers.NewAttributeDescription("Set match discriminator 3").String,
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(1, 32),
@@ -132,7 +132,7 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 			},
 			"monitor_discriminator_nomatch1": schema.StringAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("Set no-match discriminator 1").String + "\n  - **Not supported from version `25.4` and above**",
+				MarkdownDescription: helpers.NewAttributeDescription("Set no-match discriminator 1").String,
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(1, 32),
@@ -140,7 +140,7 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 			},
 			"monitor_discriminator_nomatch2": schema.StringAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("Set no-match discriminator 2").String + "\n  - **Not supported from version `25.4` and above**",
+				MarkdownDescription: helpers.NewAttributeDescription("Set no-match discriminator 2").String,
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(1, 32),
@@ -148,7 +148,7 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 			},
 			"monitor_discriminator_nomatch3": schema.StringAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("Set no-match discriminator 3").String + "\n  - **Not supported from version `25.4` and above**",
+				MarkdownDescription: helpers.NewAttributeDescription("Set no-match discriminator 3").String,
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(1, 32),
@@ -342,6 +342,14 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 								stringvalidator.OneOf("alerts", "critical", "debugging", "emergencies", "error", "info", "notifications", "warning", "disable", "errors", "informational"),
 							},
 						},
+						"local_accounting": schema.BoolAttribute{
+							MarkdownDescription: helpers.NewAttributeDescription("Store only the command accounting logs").String,
+							Optional:            true,
+						},
+						"send_to_remote": schema.BoolAttribute{
+							MarkdownDescription: helpers.NewAttributeDescription("Send the command accounting logs to syslog server").String,
+							Optional:            true,
+						},
 						"local_accounting_send_to_remote_facility_level": schema.StringAttribute{
 							MarkdownDescription: helpers.NewAttributeDescription("configure this node").AddStringEnumDescription("auth", "cron", "daemon", "kern", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7", "lpr", "mail", "news", "sys10", "sys11", "sys12", "sys13", "sys14", "sys9", "syslog", "user", "uucp").String + "\n  - **Not supported from version `25.4` and above**",
 							Optional:            true,
@@ -396,14 +404,6 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 								stringvalidator.LengthBetween(1, 32),
 								stringvalidator.RegexMatches(regexp.MustCompile(`[\w\-\.:,_@#%$\+=\| ;]+`), ""),
 							},
-						},
-						"local_accounting": schema.BoolAttribute{
-							MarkdownDescription: helpers.NewAttributeDescription("Store only the command accounting logs").String + "\n  - Supported from version: `25.4`",
-							Optional:            true,
-						},
-						"send_to_remote": schema.BoolAttribute{
-							MarkdownDescription: helpers.NewAttributeDescription("Send the command accounting logs to syslog server").String + "\n  - Supported from version: `25.4`",
-							Optional:            true,
 						},
 						"send_to_remote_facility": schema.StringAttribute{
 							MarkdownDescription: helpers.NewAttributeDescription("Modify message logging facilities").AddStringEnumDescription("auth", "cron", "daemon", "kern", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7", "lpr", "mail", "news", "syslog", "user", "uucp").String + "\n  - Supported from version: `25.4`",

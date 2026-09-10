@@ -119,6 +119,15 @@ attributes:
         optional: true
         delete_parent: true
         example: info
+      - yang_name: local-accounting
+        type: Bool
+        type_yang_bool: presence
+        example: true
+      - yang_name: local-accounting/send-to-remote
+        tf_name: send_to_remote
+        type: Bool
+        type_yang_bool: presence
+        example: true
       - yang_name: local-accounting/send-to-remote/facility/level
         tf_name: local_accounting_send_to_remote_facility_level
         example: local0

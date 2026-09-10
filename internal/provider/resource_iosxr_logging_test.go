@@ -102,6 +102,8 @@ func TestAccIosxrLogging(t *testing.T) {
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.path", "/disk0:"))
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.maxfilesize", "1024"))
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.severity", "informational"))
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.local_accounting", "true"))
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.send_to_remote", "true"))
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.local_accounting_send_to_remote_facility_level", "local0"))
 	}
@@ -111,12 +113,6 @@ func TestAccIosxrLogging(t *testing.T) {
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.discriminator_nomatch1", "NOMATCH1"))
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.discriminator_nomatch2", "NOMATCH2"))
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.discriminator_nomatch3", "NOMATCH3"))
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.local_accounting", "true"))
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.send_to_remote", "true"))
-	}
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.send_to_remote_facility", "auth"))
 	}
@@ -299,6 +295,8 @@ func testAccIosxrLoggingConfig_all() string {
 	config += `		path = "/disk0:"` + "\n"
 	config += `		maxfilesize = 1024` + "\n"
 	config += `		severity = "informational"` + "\n"
+	config += `		local_accounting = true` + "\n"
+	config += `		send_to_remote = true` + "\n"
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		config += `		local_accounting_send_to_remote_facility_level = "local0"` + "\n"
 	}
@@ -308,12 +306,6 @@ func testAccIosxrLoggingConfig_all() string {
 	config += `		discriminator_nomatch1 = "NOMATCH1"` + "\n"
 	config += `		discriminator_nomatch2 = "NOMATCH2"` + "\n"
 	config += `		discriminator_nomatch3 = "NOMATCH3"` + "\n"
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `		local_accounting = true` + "\n"
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `		send_to_remote = true` + "\n"
-	}
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		config += `		send_to_remote_facility = "auth"` + "\n"
 	}

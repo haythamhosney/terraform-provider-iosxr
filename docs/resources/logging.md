@@ -43,12 +43,6 @@ This resource can manage the Logging configuration.
 | `ipv4_precedence` | `25.4` |
 | `ipv6_dscp` | `25.4` |
 | `ipv6_precedence` | `25.4` |
-| `monitor_discriminator_match1` | `25.4` |
-| `monitor_discriminator_match2` | `25.4` |
-| `monitor_discriminator_match3` | `25.4` |
-| `monitor_discriminator_nomatch1` | `25.4` |
-| `monitor_discriminator_nomatch2` | `25.4` |
-| `monitor_discriminator_nomatch3` | `25.4` |
 | `source_interfaces.name` | `25.4` |
 | `source_interfaces.vrfs` | `25.4` |
 | `suppress_duplicates` | `25.4` |
@@ -89,6 +83,8 @@ resource "iosxr_logging" "example" {
       path                                           = "/disk0:"
       maxfilesize                                    = 1024
       severity                                       = "informational"
+      local_accounting                               = true
+      send_to_remote                                 = true
       local_accounting_send_to_remote_facility_level = "local0"
       discriminator_match1                           = "MATCH1"
       discriminator_match2                           = "MATCH2"
@@ -96,8 +92,6 @@ resource "iosxr_logging" "example" {
       discriminator_nomatch1                         = "NOMATCH1"
       discriminator_nomatch2                         = "NOMATCH2"
       discriminator_nomatch3                         = "NOMATCH3"
-      local_accounting                               = true
-      send_to_remote                                 = true
       send_to_remote_facility                        = "auth"
     }
   ]
@@ -265,17 +259,11 @@ resource "iosxr_logging" "example" {
 - `monitor` (String) Set monitor logging
   - Choices: `alerts`, `critical`, `debugging`, `disable`, `emergencies`, `errors`, `informational`, `notifications`, `warning`
 - `monitor_discriminator_match1` (String) Set match discriminator 1
-  - **Not supported from version `25.4` and above**
 - `monitor_discriminator_match2` (String) Set match discriminator 2
-  - **Not supported from version `25.4` and above**
 - `monitor_discriminator_match3` (String) Set match discriminator 3
-  - **Not supported from version `25.4` and above**
 - `monitor_discriminator_nomatch1` (String) Set no-match discriminator 1
-  - **Not supported from version `25.4` and above**
 - `monitor_discriminator_nomatch2` (String) Set no-match discriminator 2
-  - **Not supported from version `25.4` and above**
 - `monitor_discriminator_nomatch3` (String) Set no-match discriminator 3
-  - **Not supported from version `25.4` and above**
 - `source_interfaces` (Attributes List) Specify interface for source address in logging transactions (see [below for nested schema](#nestedatt--source_interfaces))
 - `suppress_duplicates` (Boolean) Suppress consecutive duplicate messages
   - **Not supported from version `25.4` and above**
@@ -312,12 +300,10 @@ Optional:
 - `discriminator_nomatch2` (String) Set no-match discriminator 2
 - `discriminator_nomatch3` (String) Set no-match discriminator 3
 - `local_accounting` (Boolean) Store only the command accounting logs
-  - Supported from version: `25.4`
 - `local_accounting_send_to_remote_facility_level` (String) configure this node
   - Choices: `auth`, `cron`, `daemon`, `kern`, `local0`, `local1`, `local2`, `local3`, `local4`, `local5`, `local6`, `local7`, `lpr`, `mail`, `news`, `sys10`, `sys11`, `sys12`, `sys13`, `sys14`, `sys9`, `syslog`, `user`, `uucp`
   - **Not supported from version `25.4` and above**
 - `send_to_remote` (Boolean) Send the command accounting logs to syslog server
-  - Supported from version: `25.4`
 - `send_to_remote_facility` (String) Modify message logging facilities
   - Choices: `auth`, `cron`, `daemon`, `kern`, `local0`, `local1`, `local2`, `local3`, `local4`, `local5`, `local6`, `local7`, `lpr`, `mail`, `news`, `syslog`, `user`, `uucp`
   - Supported from version: `25.4`

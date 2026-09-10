@@ -102,11 +102,11 @@ func (data NetconfYangAgent) toBody(ctx context.Context, providerVersion string)
 		body, _ = sjson.Set(body, "session.absolute-timeout", strconv.FormatInt(data.SessionAbsoluteTimeout.ValueInt64(), 10))
 	}
 	if !data.NetconfV1.IsNull() && !data.NetconfV1.IsUnknown() {
-		body, _ = sjson.Set(body, "netconf1\\.0.support", data.NetconfV1.ValueString())
+		body, _ = sjson.Set(body, "netconf1\\\\.0.support", data.NetconfV1.ValueString())
 	}
 	if !data.NetconfV1StreamingDisabled.IsNull() && !data.NetconfV1StreamingDisabled.IsUnknown() {
 		if data.NetconfV1StreamingDisabled.ValueBool() {
-			body, _ = sjson.Set(body, "netconf1\\.0.streaming-disabled", []interface{}{nil})
+			body, _ = sjson.Set(body, "netconf1\\\\.0.streaming-disabled", []interface{}{nil})
 		}
 	}
 	return body
@@ -207,12 +207,12 @@ func (data *NetconfYangAgent) updateFromBody(ctx context.Context, res []byte, ve
 	} else {
 		data.SessionAbsoluteTimeout = types.Int64Null()
 	}
-	if value := gjson.GetBytes(res, "netconf1\\.0.support"); value.Exists() && value.Type == gjson.String && !data.NetconfV1.IsNull() {
+	if value := gjson.GetBytes(res, "netconf1\\\\.0.support"); value.Exists() && value.Type == gjson.String && !data.NetconfV1.IsNull() {
 		data.NetconfV1 = types.StringValue(value.String())
 	} else {
 		data.NetconfV1 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "netconf1\\.0.streaming-disabled"); !data.NetconfV1StreamingDisabled.IsNull() {
+	if value := gjson.GetBytes(res, "netconf1\\\\.0.streaming-disabled"); !data.NetconfV1StreamingDisabled.IsNull() {
 		if value.Exists() {
 			data.NetconfV1StreamingDisabled = types.BoolValue(true)
 		} else {
@@ -250,10 +250,10 @@ func (data *NetconfYangAgent) fromBody(ctx context.Context, res []byte, version 
 	if value := gjson.GetBytes(res, "session.absolute-timeout"); value.Exists() && value.Type == gjson.Number {
 		data.SessionAbsoluteTimeout = types.Int64Value(value.Int())
 	}
-	if value := gjson.GetBytes(res, "netconf1\\.0.support"); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, "netconf1\\\\.0.support"); value.Exists() && value.Type == gjson.String {
 		data.NetconfV1 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, "netconf1\\.0.streaming-disabled"); value.Exists() {
+	if value := gjson.GetBytes(res, "netconf1\\\\.0.streaming-disabled"); value.Exists() {
 		data.NetconfV1StreamingDisabled = types.BoolValue(true)
 	} else {
 		data.NetconfV1StreamingDisabled = types.BoolValue(false)
@@ -287,10 +287,10 @@ func (data *NetconfYangAgentData) fromBody(ctx context.Context, res []byte, vers
 	if value := gjson.GetBytes(res, "session.absolute-timeout"); value.Exists() && value.Type == gjson.Number {
 		data.SessionAbsoluteTimeout = types.Int64Value(value.Int())
 	}
-	if value := gjson.GetBytes(res, "netconf1\\.0.support"); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, "netconf1\\\\.0.support"); value.Exists() && value.Type == gjson.String {
 		data.NetconfV1 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, "netconf1\\.0.streaming-disabled"); value.Exists() {
+	if value := gjson.GetBytes(res, "netconf1\\\\.0.streaming-disabled"); value.Exists() {
 		data.NetconfV1StreamingDisabled = types.BoolValue(true)
 	} else {
 		data.NetconfV1StreamingDisabled = types.BoolValue(false)

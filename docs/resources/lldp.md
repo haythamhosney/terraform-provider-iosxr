@@ -10,6 +10,20 @@ description: |-
 
 This resource can manage the LLDP configuration.
 
+## Version Compatibility
+
+### Removed from version
+
+| Attribute | Version |
+|-----------|:-------:|
+| `chassis_id_type_chassis_component` | `25.4` |
+| `chassis_id_type_interface_alias` | `25.4` |
+| `chassis_id_type_interface_name` | `25.4` |
+| `chassis_id_type_local` | `25.4` |
+| `chassis_id_type_mac_address` | `25.4` |
+| `chassis_id_type_network_address` | `25.4` |
+| `chassis_id_type_port_component` | `25.4` |
+
 ## Example Usage
 
 ```terraform

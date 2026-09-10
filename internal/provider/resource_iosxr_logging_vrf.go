@@ -87,7 +87,7 @@ func (r *LoggingVRFResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 			},
 			"hostnames": schema.ListNestedAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("Name of the logging host").String,
+				MarkdownDescription: helpers.NewAttributeDescription("Name of the logging host").String + "\n  - **Not supported from version `25.4` and above**",
 				Optional:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -136,7 +136,7 @@ func (r *LoggingVRFResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 			},
 			"host_ipv4_addresses": schema.ListNestedAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("IPV4 address of the logging host").String,
+				MarkdownDescription: helpers.NewAttributeDescription("IPV4 address of the logging host").String + "\n  - **Not supported from version `25.4` and above**",
 				Optional:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -188,7 +188,7 @@ func (r *LoggingVRFResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 			},
 			"host_ipv6_addresses": schema.ListNestedAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("IPV6 address of the logging host").String,
+				MarkdownDescription: helpers.NewAttributeDescription("IPV6 address of the logging host").String + "\n  - **Not supported from version `25.4` and above**",
 				Optional:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -270,6 +270,10 @@ func (r *LoggingVRFResource) Create(ctx context.Context, req resource.CreateRequ
 	device, ok := r.data.Devices[plan.Device.ValueString()]
 	if !ok {
 		resp.Diagnostics.AddAttributeError(path.Root("device"), "Invalid device", fmt.Sprintf("Device '%s' does not exist in provider configuration.", plan.Device.ValueString()))
+		return
+	}
+	// Validate version compatibility using device-specific version
+	if !helpers.Validate(device.Version, plan, &resp.Diagnostics) {
 		return
 	}
 	tflog.Debug(ctx, fmt.Sprintf("%s: Beginning Create", plan.getPath()))
@@ -403,6 +407,10 @@ func (r *LoggingVRFResource) Update(ctx context.Context, req resource.UpdateRequ
 		resp.Diagnostics.AddAttributeError(path.Root("device"), "Invalid device", fmt.Sprintf("Device '%s' does not exist in provider configuration.", plan.Device.ValueString()))
 		return
 	}
+	// Validate version compatibility using device-specific version
+	if !helpers.Validate(device.Version, plan, &resp.Diagnostics) {
+		return
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("%s: Beginning Update", plan.Id.ValueString()))
 
@@ -459,6 +467,14 @@ func (r *LoggingVRFResource) Delete(ctx context.Context, req resource.DeleteRequ
 	if !ok {
 		resp.Diagnostics.AddAttributeError(path.Root("device"), "Invalid device", fmt.Sprintf("Device '%s' does not exist in provider configuration.", state.Device.ValueString()))
 		return
+	}
+
+	// Validate version compatibility (only check if resource/fields are supported)
+	if len(state.GetVersionConstraints()) > 0 {
+		helpers.ValidateVersionConstraints(device.Version, state, state.GetVersionConstraints(), &resp.Diagnostics)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("%s: Beginning Delete", state.Id.ValueString()))

@@ -36,7 +36,6 @@ data "iosxr_logging" "example" {
 - `archive_severity` (String) The minimum severity of log messages to archive
 - `archive_size` (Number) The total size of the archive
 - `archive_threshold` (Number) The size threshold at which a syslog is generated
-- `buffered_buffered_level` (String) buffered level
 - `buffered_discriminator_match1` (String) Set match discriminator 1
 - `buffered_discriminator_match2` (String) Set match discriminator 2
 - `buffered_discriminator_match3` (String) Set match discriminator 3
@@ -44,11 +43,9 @@ data "iosxr_logging" "example" {
 - `buffered_discriminator_nomatch2` (String) Set no-match discriminator 2
 - `buffered_discriminator_nomatch3` (String) Set no-match discriminator 3
 - `buffered_entries_count` (Number) Syslog in buffer
-- `buffered_level` (String) configure this node
-- `buffered_log_buffer_size` (Number) Logging buffer size
+- `buffered_level` (String) buffered level
 - `buffered_size` (Number) Logging buffer size
-- `console` (String) Set console logging
-- `console_console_level` (String) console level
+- `console` (String) console level
 - `console_discriminator_match1` (String) Set match discriminator 1
 - `console_discriminator_match2` (String) Set match discriminator 2
 - `console_discriminator_match3` (String) Set match discriminator 3
@@ -70,8 +67,7 @@ data "iosxr_logging" "example" {
 - `filter_matches` (Attributes List) Configure match string to filter (see [below for nested schema](#nestedatt--filter_matches))
 - `format_bsd` (Boolean) Enable to send the syslog message as BSD format
 - `format_rfc5424` (Boolean) Enable to send the syslog message rfc5424 format
-- `history` (String) Set history logging
-- `history_level` (String) history level
+- `history` (String) history level
 - `history_size` (Number) Logging history size
 - `hostnameprefix` (String) Hostname prefix to add on msgs to servers
 - `id` (String) The path of the retrieved object.
@@ -87,7 +83,6 @@ data "iosxr_logging" "example" {
 - `monitor_discriminator_nomatch1` (String) Set no-match discriminator 1
 - `monitor_discriminator_nomatch2` (String) Set no-match discriminator 2
 - `monitor_discriminator_nomatch3` (String) Set no-match discriminator 3
-- `monitor_monitor_level` (String) Set monitor logging
 - `source_interfaces` (Attributes List) Specify interface for source address in logging transactions (see [below for nested schema](#nestedatt--source_interfaces))
 - `suppress_duplicates` (Boolean) Suppress consecutive duplicate messages
 - `suppress_rules` (Attributes List) Configure a specified suppression rule (see [below for nested schema](#nestedatt--suppress_rules))
@@ -109,13 +104,10 @@ Read-Only:
 - `local_accounting` (Boolean) Store only the command accounting logs
 - `local_accounting_send_to_remote_facility_level` (String) configure this node
 - `maxfilesize` (Number) Set max file size
-- `path` (String) Set file path
-- `path_maxfilesize` (Number) Set max file size
-- `path_path_name` (String) File path (e.g. /disk0: )
-- `path_severity` (String) severity
+- `path` (String) File path (e.g. /disk0: )
 - `send_to_remote` (Boolean) Send the command accounting logs to syslog server
 - `send_to_remote_facility` (String) Modify message logging facilities
-- `severity` (String) Set severity level
+- `severity` (String) severity
 
 
 <a id="nestedatt--filter_matches"></a>

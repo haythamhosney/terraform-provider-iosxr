@@ -36,24 +36,30 @@ import (
 func TestAccIosxrLoggingVRF(t *testing.T) {
 	var checks []resource.TestCheckFunc
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "vrf_name", "default"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.name", "server.cisco.com"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.severity", "info"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.port", "514"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.operator", "equals"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.facility", "local0"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.hostname_source_address", "1.1.1.2"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.ipv4_address", "1.1.1.1"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.severity", "info"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.port", "514"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.operator", "equals"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.facility", "local0"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.ipv4_source_address", "1.1.1.2"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.ipv6_address", "2001:db8::1"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.severity", "info"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.port", "514"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.operator", "equals-or-higher"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.facility", "local0"))
-	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.ipv6_source_address", "2001:db8::2"))
+	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.name", "server.cisco.com"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.severity", "info"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.port", "514"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.operator", "equals"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.facility", "local0"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "hostnames.0.hostname_source_address", "1.1.1.2"))
+	}
+	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.ipv4_address", "1.1.1.1"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.severity", "info"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.port", "514"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.operator", "equals"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.facility", "local0"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv4_addresses.0.ipv4_source_address", "1.1.1.2"))
+	}
+	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.ipv6_address", "2001:db8::1"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.severity", "info"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.port", "514"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.operator", "equals-or-higher"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.facility", "local0"))
+		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging_vrf.test", "host_ipv6_addresses.0.ipv6_source_address", "2001:db8::2"))
+	}
 	var steps []resource.TestStep
 	if os.Getenv("SKIP_MINIMUM_TEST") == "" {
 		steps = append(steps, resource.TestStep{
@@ -117,10 +123,12 @@ resource "iosxr_gnmi" "PreReq0" {
 func testAccIosxrLoggingVRFConfig_minimum() string {
 	config := `resource "iosxr_logging_vrf" "test" {` + "\n"
 	config += `	vrf_name = "default"` + "\n"
-	config += `	host_ipv4_addresses = [{` + "\n"
-	config += `		ipv4_address = "1.1.1.1"` + "\n"
-	config += `		severity = "info"` + "\n"
-	config += `		}]` + "\n"
+	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
+		config += `	host_ipv4_addresses = [{` + "\n"
+		config += `		ipv4_address = "1.1.1.1"` + "\n"
+		config += `		severity = "info"` + "\n"
+		config += `		}]` + "\n"
+	}
 	config += `	depends_on = [iosxr_gnmi.PreReq0, ]` + "\n"
 	config += `}` + "\n"
 	return config
@@ -133,30 +141,36 @@ func testAccIosxrLoggingVRFConfig_minimum() string {
 func testAccIosxrLoggingVRFConfig_all() string {
 	config := `resource "iosxr_logging_vrf" "test" {` + "\n"
 	config += `	vrf_name = "default"` + "\n"
-	config += `	hostnames = [{` + "\n"
-	config += `		name = "server.cisco.com"` + "\n"
-	config += `		severity = "info"` + "\n"
-	config += `		port = 514` + "\n"
-	config += `		operator = "equals"` + "\n"
-	config += `		facility = "local0"` + "\n"
-	config += `		hostname_source_address = "1.1.1.2"` + "\n"
-	config += `		}]` + "\n"
-	config += `	host_ipv4_addresses = [{` + "\n"
-	config += `		ipv4_address = "1.1.1.1"` + "\n"
-	config += `		severity = "info"` + "\n"
-	config += `		port = 514` + "\n"
-	config += `		operator = "equals"` + "\n"
-	config += `		facility = "local0"` + "\n"
-	config += `		ipv4_source_address = "1.1.1.2"` + "\n"
-	config += `		}]` + "\n"
-	config += `	host_ipv6_addresses = [{` + "\n"
-	config += `		ipv6_address = "2001:db8::1"` + "\n"
-	config += `		severity = "info"` + "\n"
-	config += `		port = 514` + "\n"
-	config += `		operator = "equals-or-higher"` + "\n"
-	config += `		facility = "local0"` + "\n"
-	config += `		ipv6_source_address = "2001:db8::2"` + "\n"
-	config += `		}]` + "\n"
+	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
+		config += `	hostnames = [{` + "\n"
+		config += `		name = "server.cisco.com"` + "\n"
+		config += `		severity = "info"` + "\n"
+		config += `		port = 514` + "\n"
+		config += `		operator = "equals"` + "\n"
+		config += `		facility = "local0"` + "\n"
+		config += `		hostname_source_address = "1.1.1.2"` + "\n"
+		config += `		}]` + "\n"
+	}
+	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
+		config += `	host_ipv4_addresses = [{` + "\n"
+		config += `		ipv4_address = "1.1.1.1"` + "\n"
+		config += `		severity = "info"` + "\n"
+		config += `		port = 514` + "\n"
+		config += `		operator = "equals"` + "\n"
+		config += `		facility = "local0"` + "\n"
+		config += `		ipv4_source_address = "1.1.1.2"` + "\n"
+		config += `		}]` + "\n"
+	}
+	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
+		config += `	host_ipv6_addresses = [{` + "\n"
+		config += `		ipv6_address = "2001:db8::1"` + "\n"
+		config += `		severity = "info"` + "\n"
+		config += `		port = 514` + "\n"
+		config += `		operator = "equals-or-higher"` + "\n"
+		config += `		facility = "local0"` + "\n"
+		config += `		ipv6_source_address = "2001:db8::2"` + "\n"
+		config += `		}]` + "\n"
+	}
 	config += `	depends_on = [iosxr_gnmi.PreReq0, ]` + "\n"
 	config += `}` + "\n"
 	return config

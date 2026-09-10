@@ -1,7 +1,7 @@
 resource "iosxr_logging" "example" {
-  console                         = "disable"
+  console                         = "alerts"
   trap                            = "informational"
-  monitor                         = "disable"
+  monitor                         = "alerts"
   console_facility                = "all"
   archive_disk0                   = true
   archive_frequency_daily         = true
@@ -15,7 +15,7 @@ resource "iosxr_logging" "example" {
   facility_level                  = "local7"
   buffered_entries_count          = 10000
   buffered_size                   = 4000000
-  buffered_level                  = "debugging"
+  buffered_level                  = "alerts"
   buffered_discriminator_match1   = "BUFFERED1"
   buffered_discriminator_match2   = "BUFFERED2"
   buffered_discriminator_match3   = "BUFFERED3"
@@ -29,7 +29,7 @@ resource "iosxr_logging" "example" {
       file_name                                      = "logfile1"
       path                                           = "/disk0:"
       maxfilesize                                    = 1024
-      severity                                       = "info"
+      severity                                       = "informational"
       local_accounting_send_to_remote_facility_level = "local0"
       discriminator_match1                           = "MATCH1"
       discriminator_match2                           = "MATCH2"
@@ -40,12 +40,9 @@ resource "iosxr_logging" "example" {
       local_accounting                               = true
       send_to_remote                                 = true
       send_to_remote_facility                        = "auth"
-      path_maxfilesize                               = 1024
-      path_path_name                                 = "/disk0:"
-      path_severity                                  = "informational"
     }
   ]
-  history        = "emergencies"
+  history        = "alerts"
   history_size   = 500
   hostnameprefix = "HOSTNAME01"
   localfilesize  = 1000
@@ -86,9 +83,6 @@ resource "iosxr_logging" "example" {
   events_display_location        = true
   events_level                   = "informational"
   events_threshold               = 80
-  buffered_buffered_level        = "alerts"
-  buffered_log_buffer_size       = 4000000
-  console_console_level          = "alerts"
   console_discriminator_match1   = "MATCH1"
   console_discriminator_match2   = "MATCH2"
   console_discriminator_match3   = "MATCH3"
@@ -96,6 +90,4 @@ resource "iosxr_logging" "example" {
   console_discriminator_nomatch2 = "NOMATCH2"
   console_discriminator_nomatch3 = "NOMATCH3"
   facility_all                   = "all"
-  history_level                  = "alerts"
-  monitor_monitor_level          = "alerts"
 }

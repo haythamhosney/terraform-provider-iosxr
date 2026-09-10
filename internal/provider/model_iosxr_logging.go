@@ -93,9 +93,6 @@ type Logging struct {
 	EventsThreshold                types.Int64               `tfsdk:"events_threshold"`
 	EventsPrecfgSuppression        types.String              `tfsdk:"events_precfg_suppression"`
 	EventsPrecfgSuppressionTimeout types.Int64               `tfsdk:"events_precfg_suppression_timeout"`
-	BufferedBufferedLevel          types.String              `tfsdk:"buffered_buffered_level"`
-	BufferedLogBufferSize          types.Int64               `tfsdk:"buffered_log_buffer_size"`
-	ConsoleConsoleLevel            types.String              `tfsdk:"console_console_level"`
 	ConsoleDiscriminatorMatch1     types.String              `tfsdk:"console_discriminator_match1"`
 	ConsoleDiscriminatorMatch2     types.String              `tfsdk:"console_discriminator_match2"`
 	ConsoleDiscriminatorMatch3     types.String              `tfsdk:"console_discriminator_match3"`
@@ -103,8 +100,6 @@ type Logging struct {
 	ConsoleDiscriminatorNomatch2   types.String              `tfsdk:"console_discriminator_nomatch2"`
 	ConsoleDiscriminatorNomatch3   types.String              `tfsdk:"console_discriminator_nomatch3"`
 	FacilityAll                    types.String              `tfsdk:"facility_all"`
-	HistoryLevel                   types.String              `tfsdk:"history_level"`
-	MonitorMonitorLevel            types.String              `tfsdk:"monitor_monitor_level"`
 }
 
 type LoggingData struct {
@@ -164,9 +159,6 @@ type LoggingData struct {
 	EventsThreshold                types.Int64               `tfsdk:"events_threshold"`
 	EventsPrecfgSuppression        types.String              `tfsdk:"events_precfg_suppression"`
 	EventsPrecfgSuppressionTimeout types.Int64               `tfsdk:"events_precfg_suppression_timeout"`
-	BufferedBufferedLevel          types.String              `tfsdk:"buffered_buffered_level"`
-	BufferedLogBufferSize          types.Int64               `tfsdk:"buffered_log_buffer_size"`
-	ConsoleConsoleLevel            types.String              `tfsdk:"console_console_level"`
 	ConsoleDiscriminatorMatch1     types.String              `tfsdk:"console_discriminator_match1"`
 	ConsoleDiscriminatorMatch2     types.String              `tfsdk:"console_discriminator_match2"`
 	ConsoleDiscriminatorMatch3     types.String              `tfsdk:"console_discriminator_match3"`
@@ -174,8 +166,6 @@ type LoggingData struct {
 	ConsoleDiscriminatorNomatch2   types.String              `tfsdk:"console_discriminator_nomatch2"`
 	ConsoleDiscriminatorNomatch3   types.String              `tfsdk:"console_discriminator_nomatch3"`
 	FacilityAll                    types.String              `tfsdk:"facility_all"`
-	HistoryLevel                   types.String              `tfsdk:"history_level"`
-	MonitorMonitorLevel            types.String              `tfsdk:"monitor_monitor_level"`
 }
 type LoggingFile struct {
 	FileName                                 types.String `tfsdk:"file_name"`
@@ -192,9 +182,6 @@ type LoggingFile struct {
 	LocalAccounting                          types.Bool   `tfsdk:"local_accounting"`
 	SendToRemote                             types.Bool   `tfsdk:"send_to_remote"`
 	SendToRemoteFacility                     types.String `tfsdk:"send_to_remote_facility"`
-	PathMaxfilesize                          types.Int64  `tfsdk:"path_maxfilesize"`
-	PathPathName                             types.String `tfsdk:"path_path_name"`
-	PathSeverity                             types.String `tfsdk:"path_severity"`
 }
 type LoggingSourceInterfaces struct {
 	Name          types.String                  `tfsdk:"name"`
@@ -242,18 +229,14 @@ func (data LoggingData) getPath() string {
 
 func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 	body := "{}"
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.Console.IsNull() && !data.Console.IsUnknown() {
-			body, _ = sjson.Set(body, "console", data.Console.ValueString())
-		}
+	if !data.Console.IsNull() && !data.Console.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "console.console-level", "console", "25.4"), data.Console.ValueString())
 	}
 	if !data.Trap.IsNull() && !data.Trap.IsUnknown() {
 		body, _ = sjson.Set(body, "trap", data.Trap.ValueString())
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.Monitor.IsNull() && !data.Monitor.IsUnknown() {
-			body, _ = sjson.Set(body, "monitor", data.Monitor.ValueString())
-		}
+	if !data.Monitor.IsNull() && !data.Monitor.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.monitor-level", "monitor", "25.4"), data.Monitor.ValueString())
 	}
 	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
 		if !data.ConsoleFacility.IsNull() && !data.ConsoleFacility.IsUnknown() {
@@ -375,20 +358,14 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 			body, _ = sjson.Set(body, "facility.level", data.FacilityLevel.ValueString())
 		}
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.BufferedEntriesCount.IsNull() && !data.BufferedEntriesCount.IsUnknown() {
-			body, _ = sjson.Set(body, "buffered.entries-count", strconv.FormatInt(data.BufferedEntriesCount.ValueInt64(), 10))
-		}
+	if !data.BufferedEntriesCount.IsNull() && !data.BufferedEntriesCount.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "buffered.entries-count", "buffered.buffered-entries.count", "25.4"), strconv.FormatInt(data.BufferedEntriesCount.ValueInt64(), 10))
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.BufferedSize.IsNull() && !data.BufferedSize.IsUnknown() {
-			body, _ = sjson.Set(body, "buffered.logging-buffer-size", strconv.FormatInt(data.BufferedSize.ValueInt64(), 10))
-		}
+	if !data.BufferedSize.IsNull() && !data.BufferedSize.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "buffered.log-buffer-size", "buffered.logging-buffer-size", "25.4"), strconv.FormatInt(data.BufferedSize.ValueInt64(), 10))
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.BufferedLevel.IsNull() && !data.BufferedLevel.IsUnknown() {
-			body, _ = sjson.Set(body, "buffered.level", data.BufferedLevel.ValueString())
-		}
+	if !data.BufferedLevel.IsNull() && !data.BufferedLevel.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "buffered.buffered-level", "buffered.level", "25.4"), data.BufferedLevel.ValueString())
 	}
 	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
 		if !data.BufferedDiscriminatorMatch1.IsNull() && !data.BufferedDiscriminatorMatch1.IsUnknown() {
@@ -434,15 +411,11 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 			}
 		}
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.History.IsNull() && !data.History.IsUnknown() {
-			body, _ = sjson.Set(body, "history", data.History.ValueString())
-		}
+	if !data.History.IsNull() && !data.History.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "history.level", "history", "25.4"), data.History.ValueString())
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.HistorySize.IsNull() && !data.HistorySize.IsUnknown() {
-			body, _ = sjson.Set(body, "history.size", strconv.FormatInt(data.HistorySize.ValueInt64(), 10))
-		}
+	if !data.HistorySize.IsNull() && !data.HistorySize.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "history.size", "history-size", "25.4"), strconv.FormatInt(data.HistorySize.ValueInt64(), 10))
 	}
 	if !data.Hostnameprefix.IsNull() && !data.Hostnameprefix.IsUnknown() {
 		body, _ = sjson.Set(body, "hostnameprefix", data.Hostnameprefix.ValueString())
@@ -497,21 +470,6 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 		body, _ = sjson.Set(body, "Cisco-IOS-XR-um-logging-events-cfg:events.precfg-suppression-timeout", strconv.FormatInt(data.EventsPrecfgSuppressionTimeout.ValueInt64(), 10))
 	}
 	if helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.BufferedBufferedLevel.IsNull() && !data.BufferedBufferedLevel.IsUnknown() {
-			body, _ = sjson.Set(body, "buffered.buffered-level", data.BufferedBufferedLevel.ValueString())
-		}
-	}
-	if helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.BufferedLogBufferSize.IsNull() && !data.BufferedLogBufferSize.IsUnknown() {
-			body, _ = sjson.Set(body, "buffered.log-buffer-size", strconv.FormatInt(data.BufferedLogBufferSize.ValueInt64(), 10))
-		}
-	}
-	if helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.ConsoleConsoleLevel.IsNull() && !data.ConsoleConsoleLevel.IsUnknown() {
-			body, _ = sjson.Set(body, "console.console-level", data.ConsoleConsoleLevel.ValueString())
-		}
-	}
-	if helpers.VersionAtLeast(providerVersion, "25.4") {
 		if !data.ConsoleDiscriminatorMatch1.IsNull() && !data.ConsoleDiscriminatorMatch1.IsUnknown() {
 			body, _ = sjson.Set(body, "console.discriminator.match1", data.ConsoleDiscriminatorMatch1.ValueString())
 		}
@@ -546,36 +504,20 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 			body, _ = sjson.Set(body, "console.facility.all", data.FacilityAll.ValueString())
 		}
 	}
-	if helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.HistoryLevel.IsNull() && !data.HistoryLevel.IsUnknown() {
-			body, _ = sjson.Set(body, "history.level", data.HistoryLevel.ValueString())
-		}
-	}
-	if helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.MonitorMonitorLevel.IsNull() && !data.MonitorMonitorLevel.IsUnknown() {
-			body, _ = sjson.Set(body, "monitor.monitor-level", data.MonitorMonitorLevel.ValueString())
-		}
-	}
 	if len(data.File) > 0 {
 		body, _ = sjson.Set(body, "files.file", []interface{}{})
 		for index, item := range data.File {
 			if !item.FileName.IsNull() && !item.FileName.IsUnknown() {
 				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"file-name", item.FileName.ValueString())
 			}
-			if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.Path.IsNull() && !item.Path.IsUnknown() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path", item.Path.ValueString())
-				}
+			if !item.Path.IsNull() && !item.Path.IsUnknown() {
+				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.path-name", "path", "25.4"), item.Path.ValueString())
 			}
-			if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.Maxfilesize.IsNull() && !item.Maxfilesize.IsUnknown() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"maxfilesize", strconv.FormatInt(item.Maxfilesize.ValueInt64(), 10))
-				}
+			if !item.Maxfilesize.IsNull() && !item.Maxfilesize.IsUnknown() {
+				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.maxfilesize", "maxfilesize", "25.4"), strconv.FormatInt(item.Maxfilesize.ValueInt64(), 10))
 			}
-			if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.Severity.IsNull() && !item.Severity.IsUnknown() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"severity", item.Severity.ValueString())
-				}
+			if !item.Severity.IsNull() && !item.Severity.IsUnknown() {
+				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.severity", "severity", "25.4"), item.Severity.ValueString())
 			}
 			if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
 				if !item.LocalAccountingSendToRemoteFacilityLevel.IsNull() && !item.LocalAccountingSendToRemoteFacilityLevel.IsUnknown() {
@@ -617,21 +559,6 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 			if helpers.VersionAtLeast(providerVersion, "25.4") {
 				if !item.SendToRemoteFacility.IsNull() && !item.SendToRemoteFacility.IsUnknown() {
 					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path.local-accounting.send-to-remote.facility", item.SendToRemoteFacility.ValueString())
-				}
-			}
-			if helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.PathMaxfilesize.IsNull() && !item.PathMaxfilesize.IsUnknown() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path.maxfilesize", strconv.FormatInt(item.PathMaxfilesize.ValueInt64(), 10))
-				}
-			}
-			if helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.PathPathName.IsNull() && !item.PathPathName.IsUnknown() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path.path-name", item.PathPathName.ValueString())
-				}
-			}
-			if helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.PathSeverity.IsNull() && !item.PathSeverity.IsUnknown() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path.severity", item.PathSeverity.ValueString())
 				}
 			}
 		}
@@ -724,16 +651,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 	constraints := make([]helpers.FieldVersionConstraint, 0)
 
 	constraints = append(constraints, []helpers.FieldVersionConstraint{
-		{
-			FieldPath: "console",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "monitor",
-
-			RemovedInVersion: "25.4",
-		},
 		{
 			FieldPath: "console_facility",
 
@@ -845,21 +762,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 			RemovedInVersion: "25.4",
 		},
 		{
-			FieldPath: "buffered_entries_count",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "buffered_size",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "buffered_level",
-
-			RemovedInVersion: "25.4",
-		},
-		{
 			FieldPath: "buffered_discriminator_match1",
 
 			RemovedInVersion: "25.4",
@@ -900,21 +802,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 			RemovedInVersion: "25.4",
 		},
 		{
-			FieldPath: "file.path",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "file.maxfilesize",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "file.severity",
-
-			RemovedInVersion: "25.4",
-		},
-		{
 			FieldPath: "file.local_accounting_send_to_remote_facility_level",
 
 			RemovedInVersion: "25.4",
@@ -930,28 +817,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 		{
 			FieldPath:      "file.send_to_remote_facility",
 			AddedInVersion: "25.4",
-		},
-		{
-			FieldPath:      "file.path_maxfilesize",
-			AddedInVersion: "25.4",
-		},
-		{
-			FieldPath:      "file.path_path_name",
-			AddedInVersion: "25.4",
-		},
-		{
-			FieldPath:      "file.path_severity",
-			AddedInVersion: "25.4",
-		},
-		{
-			FieldPath: "history",
-
-			RemovedInVersion: "25.4",
-		},
-		{
-			FieldPath: "history_size",
-
-			RemovedInVersion: "25.4",
 		},
 		{
 			FieldPath: "source_interfaces.name",
@@ -992,18 +857,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 			RemovedInVersion: "25.4",
 		},
 		{
-			FieldPath:      "buffered_buffered_level",
-			AddedInVersion: "25.4",
-		},
-		{
-			FieldPath:      "buffered_log_buffer_size",
-			AddedInVersion: "25.4",
-		},
-		{
-			FieldPath:      "console_console_level",
-			AddedInVersion: "25.4",
-		},
-		{
 			FieldPath:      "console_discriminator_match1",
 			AddedInVersion: "25.4",
 		},
@@ -1031,14 +884,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 			FieldPath:      "facility_all",
 			AddedInVersion: "25.4",
 		},
-		{
-			FieldPath:      "history_level",
-			AddedInVersion: "25.4",
-		},
-		{
-			FieldPath:      "monitor_monitor_level",
-			AddedInVersion: "25.4",
-		},
 	}...)
 	if len(constraints) == 0 {
 		return nil
@@ -1052,7 +897,15 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 
 // GetRangeConstraints returns the version-specific range constraints for integer fields
 func (data Logging) GetRangeConstraints() []helpers.FieldRangeConstraint {
-	return nil
+	return []helpers.FieldRangeConstraint{
+		{
+			FieldPath: "buffered_size",
+			VersionRanges: map[string]helpers.VersionRange{
+				"24.4": {Min: 307200, Max: 125000000},
+				"25.4": {Min: 2097152, Max: 125000000},
+			},
+		},
+	}
 }
 
 // End of section. //template:end getRangeConstraints
@@ -1061,7 +914,15 @@ func (data Logging) GetRangeConstraints() []helpers.FieldRangeConstraint {
 
 // GetEnumConstraints returns the version-specific enum constraints for string fields
 func (data Logging) GetEnumConstraints() []helpers.FieldEnumConstraint {
-	return nil
+	return []helpers.FieldEnumConstraint{
+		{
+			FieldPath: "file.severity",
+			VersionEnums: map[string][]string{
+				"24.4": {"alerts", "critical", "debugging", "emergencies", "error", "info", "notifications", "warning"},
+				"25.4": {"alerts", "critical", "debugging", "disable", "emergencies", "errors", "informational", "notifications", "warning"},
+			},
+		},
+	}
 }
 
 // End of section. //template:end getEnumConstraints
@@ -1089,7 +950,7 @@ func (data Logging) GetPatternConstraints() []helpers.FieldPatternConstraint {
 
 // Section below is generated&owned by "gen/generator.go". //template:begin updateFromBody
 func (data *Logging) updateFromBody(ctx context.Context, res []byte, version string) {
-	if value := gjson.GetBytes(res, "console"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.Console.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.console-level", "console", "25.4")); value.Exists() && value.Type == gjson.String && !data.Console.IsNull() {
 		data.Console = types.StringValue(value.String())
 	} else {
 		data.Console = types.StringNull()
@@ -1099,7 +960,7 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 	} else {
 		data.Trap = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "monitor"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.Monitor.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.monitor-level", "monitor", "25.4")); value.Exists() && value.Type == gjson.String && !data.Monitor.IsNull() {
 		data.Monitor = types.StringValue(value.String())
 	} else {
 		data.Monitor = types.StringNull()
@@ -1234,17 +1095,17 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 	} else {
 		data.FacilityLevel = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "buffered.entries-count"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.Number && !data.BufferedEntriesCount.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.entries-count", "buffered.buffered-entries.count", "25.4")); value.Exists() && value.Type == gjson.Number && !data.BufferedEntriesCount.IsNull() {
 		data.BufferedEntriesCount = types.Int64Value(value.Int())
 	} else {
 		data.BufferedEntriesCount = types.Int64Null()
 	}
-	if value := gjson.GetBytes(res, "buffered.logging-buffer-size"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.Number && !data.BufferedSize.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.log-buffer-size", "buffered.logging-buffer-size", "25.4")); value.Exists() && value.Type == gjson.Number && !data.BufferedSize.IsNull() {
 		data.BufferedSize = types.Int64Value(value.Int())
 	} else {
 		data.BufferedSize = types.Int64Null()
 	}
-	if value := gjson.GetBytes(res, "buffered.level"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.BufferedLevel.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.buffered-level", "buffered.level", "25.4")); value.Exists() && value.Type == gjson.String && !data.BufferedLevel.IsNull() {
 		data.BufferedLevel = types.StringValue(value.String())
 	} else {
 		data.BufferedLevel = types.StringNull()
@@ -1325,17 +1186,17 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 		} else {
 			data.File[i].FileName = types.StringNull()
 		}
-		if value := r.Get("path"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.File[i].Path.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, "path.path-name", "path", "25.4")); value.Exists() && value.Type == gjson.String && !data.File[i].Path.IsNull() {
 			data.File[i].Path = types.StringValue(value.String())
 		} else {
 			data.File[i].Path = types.StringNull()
 		}
-		if value := r.Get("maxfilesize"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.Number && !data.File[i].Maxfilesize.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, "path.maxfilesize", "maxfilesize", "25.4")); value.Exists() && value.Type == gjson.Number && !data.File[i].Maxfilesize.IsNull() {
 			data.File[i].Maxfilesize = types.Int64Value(value.Int())
 		} else {
 			data.File[i].Maxfilesize = types.Int64Null()
 		}
-		if value := r.Get("severity"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.File[i].Severity.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, "path.severity", "severity", "25.4")); value.Exists() && value.Type == gjson.String && !data.File[i].Severity.IsNull() {
 			data.File[i].Severity = types.StringValue(value.String())
 		} else {
 			data.File[i].Severity = types.StringNull()
@@ -1398,28 +1259,13 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 		} else {
 			data.File[i].SendToRemoteFacility = types.StringNull()
 		}
-		if value := r.Get("path.maxfilesize"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.Number && !data.File[i].PathMaxfilesize.IsNull() {
-			data.File[i].PathMaxfilesize = types.Int64Value(value.Int())
-		} else {
-			data.File[i].PathMaxfilesize = types.Int64Null()
-		}
-		if value := r.Get("path.path-name"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.File[i].PathPathName.IsNull() {
-			data.File[i].PathPathName = types.StringValue(value.String())
-		} else {
-			data.File[i].PathPathName = types.StringNull()
-		}
-		if value := r.Get("path.severity"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.File[i].PathSeverity.IsNull() {
-			data.File[i].PathSeverity = types.StringValue(value.String())
-		} else {
-			data.File[i].PathSeverity = types.StringNull()
-		}
 	}
-	if value := gjson.GetBytes(res, "history"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.History.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.level", "history", "25.4")); value.Exists() && value.Type == gjson.String && !data.History.IsNull() {
 		data.History = types.StringValue(value.String())
 	} else {
 		data.History = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "history.size"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.Number && !data.HistorySize.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.size", "history-size", "25.4")); value.Exists() && value.Type == gjson.Number && !data.HistorySize.IsNull() {
 		data.HistorySize = types.Int64Value(value.Int())
 	} else {
 		data.HistorySize = types.Int64Null()
@@ -1724,21 +1570,6 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 	} else {
 		data.EventsPrecfgSuppressionTimeout = types.Int64Null()
 	}
-	if value := gjson.GetBytes(res, "buffered.buffered-level"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.BufferedBufferedLevel.IsNull() {
-		data.BufferedBufferedLevel = types.StringValue(value.String())
-	} else {
-		data.BufferedBufferedLevel = types.StringNull()
-	}
-	if value := gjson.GetBytes(res, "buffered.log-buffer-size"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.Number && !data.BufferedLogBufferSize.IsNull() {
-		data.BufferedLogBufferSize = types.Int64Value(value.Int())
-	} else {
-		data.BufferedLogBufferSize = types.Int64Null()
-	}
-	if value := gjson.GetBytes(res, "console.console-level"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.ConsoleConsoleLevel.IsNull() {
-		data.ConsoleConsoleLevel = types.StringValue(value.String())
-	} else {
-		data.ConsoleConsoleLevel = types.StringNull()
-	}
 	if value := gjson.GetBytes(res, "console.discriminator.match1"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.ConsoleDiscriminatorMatch1.IsNull() {
 		data.ConsoleDiscriminatorMatch1 = types.StringValue(value.String())
 	} else {
@@ -1774,16 +1605,6 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 	} else {
 		data.FacilityAll = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "history.level"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.HistoryLevel.IsNull() {
-		data.HistoryLevel = types.StringValue(value.String())
-	} else {
-		data.HistoryLevel = types.StringNull()
-	}
-	if value := gjson.GetBytes(res, "monitor.monitor-level"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.MonitorMonitorLevel.IsNull() {
-		data.MonitorMonitorLevel = types.StringValue(value.String())
-	} else {
-		data.MonitorMonitorLevel = types.StringNull()
-	}
 }
 
 // End of section. //template:end updateFromBody
@@ -1791,22 +1612,14 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 // Section below is generated&owned by "gen/generator.go". //template:begin fromBody
 
 func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "console"); value.Exists() && value.Type == gjson.String {
-			data.Console = types.StringValue(value.String())
-		}
-	} else {
-		data.Console = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.console-level", "console", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.Console = types.StringValue(value.String())
 	}
 	if value := gjson.GetBytes(res, "trap"); value.Exists() && value.Type == gjson.String {
 		data.Trap = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor"); value.Exists() && value.Type == gjson.String {
-			data.Monitor = types.StringValue(value.String())
-		}
-	} else {
-		data.Monitor = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.monitor-level", "monitor", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.Monitor = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 		if value := gjson.GetBytes(res, "console-logging.console-log-facility.console-facility-level"); value.Exists() && value.Type == gjson.String {
@@ -1972,26 +1785,14 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 	} else {
 		data.FacilityLevel = types.StringNull()
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.entries-count"); value.Exists() && value.Type == gjson.Number {
-			data.BufferedEntriesCount = types.Int64Value(value.Int())
-		}
-	} else {
-		data.BufferedEntriesCount = types.Int64Null()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.entries-count", "buffered.buffered-entries.count", "25.4")); value.Exists() && value.Type == gjson.Number {
+		data.BufferedEntriesCount = types.Int64Value(value.Int())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.logging-buffer-size"); value.Exists() && value.Type == gjson.Number {
-			data.BufferedSize = types.Int64Value(value.Int())
-		}
-	} else {
-		data.BufferedSize = types.Int64Null()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.log-buffer-size", "buffered.logging-buffer-size", "25.4")); value.Exists() && value.Type == gjson.Number {
+		data.BufferedSize = types.Int64Value(value.Int())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.level"); value.Exists() && value.Type == gjson.String {
-			data.BufferedLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.BufferedLevel = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.buffered-level", "buffered.level", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.BufferedLevel = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 		if value := gjson.GetBytes(res, "buffered.discriminator.match1"); value.Exists() && value.Type == gjson.String {
@@ -2060,26 +1861,14 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 			if cValue := v.Get("file-name"); cValue.Exists() && cValue.Type == gjson.String {
 				item.FileName = types.StringValue(cValue.String())
 			}
-			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path"); cValue.Exists() && cValue.Type == gjson.String {
-					item.Path = types.StringValue(cValue.String())
-				}
-			} else {
-				item.Path = types.StringNull()
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.path-name", "path", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
+				item.Path = types.StringValue(cValue.String())
 			}
-			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("maxfilesize"); cValue.Exists() && cValue.Type == gjson.Number {
-					item.Maxfilesize = types.Int64Value(cValue.Int())
-				}
-			} else {
-				item.Maxfilesize = types.Int64Null()
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.maxfilesize", "maxfilesize", "25.4")); cValue.Exists() && cValue.Type == gjson.Number {
+				item.Maxfilesize = types.Int64Value(cValue.Int())
 			}
-			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("severity"); cValue.Exists() && cValue.Type == gjson.String {
-					item.Severity = types.StringValue(cValue.String())
-				}
-			} else {
-				item.Severity = types.StringNull()
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.severity", "severity", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
+				item.Severity = types.StringValue(cValue.String())
 			}
 			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 				if cValue := v.Get("local-accounting.send-to-remote.facility.level"); cValue.Exists() && cValue.Type == gjson.String {
@@ -2131,44 +1920,15 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 			} else {
 				item.SendToRemoteFacility = types.StringNull()
 			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.maxfilesize"); cValue.Exists() && cValue.Type == gjson.Number {
-					item.PathMaxfilesize = types.Int64Value(cValue.Int())
-				}
-			} else {
-				item.PathMaxfilesize = types.Int64Null()
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.path-name"); cValue.Exists() && cValue.Type == gjson.String {
-					item.PathPathName = types.StringValue(cValue.String())
-				}
-			} else {
-				item.PathPathName = types.StringNull()
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.severity"); cValue.Exists() && cValue.Type == gjson.String {
-					item.PathSeverity = types.StringValue(cValue.String())
-				}
-			} else {
-				item.PathSeverity = types.StringNull()
-			}
 			data.File = append(data.File, item)
 			return true
 		})
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "history"); value.Exists() && value.Type == gjson.String {
-			data.History = types.StringValue(value.String())
-		}
-	} else {
-		data.History = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.level", "history", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.History = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "history.size"); value.Exists() && value.Type == gjson.Number {
-			data.HistorySize = types.Int64Value(value.Int())
-		}
-	} else {
-		data.HistorySize = types.Int64Null()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.size", "history-size", "25.4")); value.Exists() && value.Type == gjson.Number {
+		data.HistorySize = types.Int64Value(value.Int())
 	}
 	if value := gjson.GetBytes(res, "hostnameprefix"); value.Exists() && value.Type == gjson.String {
 		data.Hostnameprefix = types.StringValue(value.String())
@@ -2331,27 +2091,6 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 		data.EventsPrecfgSuppressionTimeout = types.Int64Value(value.Int())
 	}
 	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.buffered-level"); value.Exists() && value.Type == gjson.String {
-			data.BufferedBufferedLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.BufferedBufferedLevel = types.StringNull()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.log-buffer-size"); value.Exists() && value.Type == gjson.Number {
-			data.BufferedLogBufferSize = types.Int64Value(value.Int())
-		}
-	} else {
-		data.BufferedLogBufferSize = types.Int64Null()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "console.console-level"); value.Exists() && value.Type == gjson.String {
-			data.ConsoleConsoleLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.ConsoleConsoleLevel = types.StringNull()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
 		if value := gjson.GetBytes(res, "console.discriminator.match1"); value.Exists() && value.Type == gjson.String {
 			data.ConsoleDiscriminatorMatch1 = types.StringValue(value.String())
 		}
@@ -2399,20 +2138,6 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 		}
 	} else {
 		data.FacilityAll = types.StringNull()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "history.level"); value.Exists() && value.Type == gjson.String {
-			data.HistoryLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.HistoryLevel = types.StringNull()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.monitor-level"); value.Exists() && value.Type == gjson.String {
-			data.MonitorMonitorLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorMonitorLevel = types.StringNull()
 	}
 }
 
@@ -2421,22 +2146,14 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 // Section below is generated&owned by "gen/generator.go". //template:begin fromBodyData
 
 func (data *LoggingData) fromBody(ctx context.Context, res []byte, version string) {
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "console"); value.Exists() && value.Type == gjson.String {
-			data.Console = types.StringValue(value.String())
-		}
-	} else {
-		data.Console = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.console-level", "console", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.Console = types.StringValue(value.String())
 	}
 	if value := gjson.GetBytes(res, "trap"); value.Exists() && value.Type == gjson.String {
 		data.Trap = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor"); value.Exists() && value.Type == gjson.String {
-			data.Monitor = types.StringValue(value.String())
-		}
-	} else {
-		data.Monitor = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.monitor-level", "monitor", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.Monitor = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 		if value := gjson.GetBytes(res, "console-logging.console-log-facility.console-facility-level"); value.Exists() && value.Type == gjson.String {
@@ -2602,26 +2319,14 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 	} else {
 		data.FacilityLevel = types.StringNull()
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.entries-count"); value.Exists() && value.Type == gjson.Number {
-			data.BufferedEntriesCount = types.Int64Value(value.Int())
-		}
-	} else {
-		data.BufferedEntriesCount = types.Int64Null()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.entries-count", "buffered.buffered-entries.count", "25.4")); value.Exists() && value.Type == gjson.Number {
+		data.BufferedEntriesCount = types.Int64Value(value.Int())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.logging-buffer-size"); value.Exists() && value.Type == gjson.Number {
-			data.BufferedSize = types.Int64Value(value.Int())
-		}
-	} else {
-		data.BufferedSize = types.Int64Null()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.log-buffer-size", "buffered.logging-buffer-size", "25.4")); value.Exists() && value.Type == gjson.Number {
+		data.BufferedSize = types.Int64Value(value.Int())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.level"); value.Exists() && value.Type == gjson.String {
-			data.BufferedLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.BufferedLevel = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.buffered-level", "buffered.level", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.BufferedLevel = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 		if value := gjson.GetBytes(res, "buffered.discriminator.match1"); value.Exists() && value.Type == gjson.String {
@@ -2690,26 +2395,14 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 			if cValue := v.Get("file-name"); cValue.Exists() && cValue.Type == gjson.String {
 				item.FileName = types.StringValue(cValue.String())
 			}
-			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path"); cValue.Exists() && cValue.Type == gjson.String {
-					item.Path = types.StringValue(cValue.String())
-				}
-			} else {
-				item.Path = types.StringNull()
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.path-name", "path", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
+				item.Path = types.StringValue(cValue.String())
 			}
-			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("maxfilesize"); cValue.Exists() && cValue.Type == gjson.Number {
-					item.Maxfilesize = types.Int64Value(cValue.Int())
-				}
-			} else {
-				item.Maxfilesize = types.Int64Null()
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.maxfilesize", "maxfilesize", "25.4")); cValue.Exists() && cValue.Type == gjson.Number {
+				item.Maxfilesize = types.Int64Value(cValue.Int())
 			}
-			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("severity"); cValue.Exists() && cValue.Type == gjson.String {
-					item.Severity = types.StringValue(cValue.String())
-				}
-			} else {
-				item.Severity = types.StringNull()
+			if cValue := v.Get(helpers.SelectYangPath(version, "path.severity", "severity", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
+				item.Severity = types.StringValue(cValue.String())
 			}
 			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
 				if cValue := v.Get("local-accounting.send-to-remote.facility.level"); cValue.Exists() && cValue.Type == gjson.String {
@@ -2761,44 +2454,15 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 			} else {
 				item.SendToRemoteFacility = types.StringNull()
 			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.maxfilesize"); cValue.Exists() && cValue.Type == gjson.Number {
-					item.PathMaxfilesize = types.Int64Value(cValue.Int())
-				}
-			} else {
-				item.PathMaxfilesize = types.Int64Null()
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.path-name"); cValue.Exists() && cValue.Type == gjson.String {
-					item.PathPathName = types.StringValue(cValue.String())
-				}
-			} else {
-				item.PathPathName = types.StringNull()
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.severity"); cValue.Exists() && cValue.Type == gjson.String {
-					item.PathSeverity = types.StringValue(cValue.String())
-				}
-			} else {
-				item.PathSeverity = types.StringNull()
-			}
 			data.File = append(data.File, item)
 			return true
 		})
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "history"); value.Exists() && value.Type == gjson.String {
-			data.History = types.StringValue(value.String())
-		}
-	} else {
-		data.History = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.level", "history", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.History = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "history.size"); value.Exists() && value.Type == gjson.Number {
-			data.HistorySize = types.Int64Value(value.Int())
-		}
-	} else {
-		data.HistorySize = types.Int64Null()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.size", "history-size", "25.4")); value.Exists() && value.Type == gjson.Number {
+		data.HistorySize = types.Int64Value(value.Int())
 	}
 	if value := gjson.GetBytes(res, "hostnameprefix"); value.Exists() && value.Type == gjson.String {
 		data.Hostnameprefix = types.StringValue(value.String())
@@ -2961,27 +2625,6 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 		data.EventsPrecfgSuppressionTimeout = types.Int64Value(value.Int())
 	}
 	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.buffered-level"); value.Exists() && value.Type == gjson.String {
-			data.BufferedBufferedLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.BufferedBufferedLevel = types.StringNull()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "buffered.log-buffer-size"); value.Exists() && value.Type == gjson.Number {
-			data.BufferedLogBufferSize = types.Int64Value(value.Int())
-		}
-	} else {
-		data.BufferedLogBufferSize = types.Int64Null()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "console.console-level"); value.Exists() && value.Type == gjson.String {
-			data.ConsoleConsoleLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.ConsoleConsoleLevel = types.StringNull()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
 		if value := gjson.GetBytes(res, "console.discriminator.match1"); value.Exists() && value.Type == gjson.String {
 			data.ConsoleDiscriminatorMatch1 = types.StringValue(value.String())
 		}
@@ -3029,20 +2672,6 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 		}
 	} else {
 		data.FacilityAll = types.StringNull()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "history.level"); value.Exists() && value.Type == gjson.String {
-			data.HistoryLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.HistoryLevel = types.StringNull()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "monitor.monitor-level"); value.Exists() && value.Type == gjson.String {
-			data.MonitorMonitorLevel = types.StringValue(value.String())
-		}
-	} else {
-		data.MonitorMonitorLevel = types.StringNull()
 	}
 }
 
@@ -3052,12 +2681,6 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 
 func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version string) []string {
 	deletedItems := make([]string, 0)
-	if helpers.VersionAtLeast(version, "25.4") && !state.MonitorMonitorLevel.IsNull() && data.MonitorMonitorLevel.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/monitor-level", state.getPath()))
-	}
-	if helpers.VersionAtLeast(version, "25.4") && !state.HistoryLevel.IsNull() && data.HistoryLevel.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/history/level", state.getPath()))
-	}
 	if helpers.VersionAtLeast(version, "25.4") && !state.FacilityAll.IsNull() && data.FacilityAll.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/console/facility/all", state.getPath()))
 	}
@@ -3078,15 +2701,6 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 	}
 	if helpers.VersionAtLeast(version, "25.4") && !state.ConsoleDiscriminatorMatch1.IsNull() && data.ConsoleDiscriminatorMatch1.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/console/discriminator/match1", state.getPath()))
-	}
-	if helpers.VersionAtLeast(version, "25.4") && !state.ConsoleConsoleLevel.IsNull() && data.ConsoleConsoleLevel.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/console/console-level", state.getPath()))
-	}
-	if helpers.VersionAtLeast(version, "25.4") && !state.BufferedLogBufferSize.IsNull() && data.BufferedLogBufferSize.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/buffered/log-buffer-size", state.getPath()))
-	}
-	if helpers.VersionAtLeast(version, "25.4") && !state.BufferedBufferedLevel.IsNull() && data.BufferedBufferedLevel.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/buffered/buffered-level", state.getPath()))
 	}
 	if !state.EventsPrecfgSuppressionTimeout.IsNull() && data.EventsPrecfgSuppressionTimeout.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/Cisco-IOS-XR-um-logging-events-cfg:events/precfg-suppression-timeout", state.getPath()))
@@ -3348,11 +2962,11 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 	if !state.Hostnameprefix.IsNull() && data.Hostnameprefix.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/hostnameprefix", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.HistorySize.IsNull() && data.HistorySize.IsNull() {
+	if !state.HistorySize.IsNull() && data.HistorySize.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/history/size", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.History.IsNull() && data.History.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/history", state.getPath()))
+	if !state.History.IsNull() && data.History.IsNull() {
+		deletedItems = append(deletedItems, fmt.Sprintf("%v/history/level", state.getPath()))
 	}
 	for i := range state.File {
 		keys := [...]string{"file-name"}
@@ -3377,15 +2991,6 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 				found = false
 			}
 			if found {
-				if helpers.VersionAtLeast(version, "25.4") && !state.File[i].PathSeverity.IsNull() && data.File[j].PathSeverity.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/severity", state.getPath(), keyString))
-				}
-				if helpers.VersionAtLeast(version, "25.4") && !state.File[i].PathPathName.IsNull() && data.File[j].PathPathName.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/path-name", state.getPath(), keyString))
-				}
-				if helpers.VersionAtLeast(version, "25.4") && !state.File[i].PathMaxfilesize.IsNull() && data.File[j].PathMaxfilesize.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/maxfilesize", state.getPath(), keyString))
-				}
 				if helpers.VersionAtLeast(version, "25.4") && !state.File[i].SendToRemoteFacility.IsNull() && data.File[j].SendToRemoteFacility.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote/facility", state.getPath(), keyString))
 				}
@@ -3416,14 +3021,14 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 				if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() && data.File[j].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/local-accounting/send-to-remote/facility/level", state.getPath(), keyString))
 				}
-				if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.File[i].Severity.IsNull() && data.File[j].Severity.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/.", state.getPath(), keyString))
+				if !state.File[i].Severity.IsNull() && data.File[j].Severity.IsNull() {
+					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path", state.getPath(), keyString))
 				}
-				if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.File[i].Maxfilesize.IsNull() && data.File[j].Maxfilesize.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/.", state.getPath(), keyString))
+				if !state.File[i].Maxfilesize.IsNull() && data.File[j].Maxfilesize.IsNull() {
+					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path", state.getPath(), keyString))
 				}
-				if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.File[i].Path.IsNull() && data.File[j].Path.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/.", state.getPath(), keyString))
+				if !state.File[i].Path.IsNull() && data.File[j].Path.IsNull() {
+					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path", state.getPath(), keyString))
 				}
 				break
 			}
@@ -3456,13 +3061,13 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.BufferedDiscriminatorMatch1.IsNull() && data.BufferedDiscriminatorMatch1.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/buffered/discriminator/match1", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.BufferedLevel.IsNull() && data.BufferedLevel.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/buffered/level", state.getPath()))
+	if !state.BufferedLevel.IsNull() && data.BufferedLevel.IsNull() {
+		deletedItems = append(deletedItems, fmt.Sprintf("%v/buffered/buffered-level", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.BufferedSize.IsNull() && data.BufferedSize.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/buffered/logging-buffer-size", state.getPath()))
+	if !state.BufferedSize.IsNull() && data.BufferedSize.IsNull() {
+		deletedItems = append(deletedItems, fmt.Sprintf("%v/buffered/log-buffer-size", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.BufferedEntriesCount.IsNull() && data.BufferedEntriesCount.IsNull() {
+	if !state.BufferedEntriesCount.IsNull() && data.BufferedEntriesCount.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/buffered/entries-count", state.getPath()))
 	}
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.FacilityLevel.IsNull() && data.FacilityLevel.IsNull() {
@@ -3531,14 +3136,14 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.ConsoleFacility.IsNull() && data.ConsoleFacility.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/console-logging/console-log-facility/console-facility-level", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.Monitor.IsNull() && data.Monitor.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor", state.getPath()))
+	if !state.Monitor.IsNull() && data.Monitor.IsNull() {
+		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/monitor-level", state.getPath()))
 	}
 	if !state.Trap.IsNull() && data.Trap.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/trap", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.Console.IsNull() && data.Console.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/console", state.getPath()))
+	if !state.Console.IsNull() && data.Console.IsNull() {
+		deletedItems = append(deletedItems, fmt.Sprintf("%v/console/console-level", state.getPath()))
 	}
 	return deletedItems
 }
@@ -3672,12 +3277,6 @@ func (data *Logging) getEmptyLeafsDelete(ctx context.Context, version string) []
 // Section below is generated&owned by "gen/generator.go". //template:begin getDeletePaths
 func (data *Logging) getDeletePaths(ctx context.Context, version string) []string {
 	var deletePaths []string
-	if helpers.VersionAtLeast(version, "25.4") && !data.MonitorMonitorLevel.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/monitor-level", data.getPath()))
-	}
-	if helpers.VersionAtLeast(version, "25.4") && !data.HistoryLevel.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/history/level", data.getPath()))
-	}
 	if helpers.VersionAtLeast(version, "25.4") && !data.FacilityAll.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/console/facility/all", data.getPath()))
 	}
@@ -3698,15 +3297,6 @@ func (data *Logging) getDeletePaths(ctx context.Context, version string) []strin
 	}
 	if helpers.VersionAtLeast(version, "25.4") && !data.ConsoleDiscriminatorMatch1.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/console/discriminator/match1", data.getPath()))
-	}
-	if helpers.VersionAtLeast(version, "25.4") && !data.ConsoleConsoleLevel.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/console/console-level", data.getPath()))
-	}
-	if helpers.VersionAtLeast(version, "25.4") && !data.BufferedLogBufferSize.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/buffered/log-buffer-size", data.getPath()))
-	}
-	if helpers.VersionAtLeast(version, "25.4") && !data.BufferedBufferedLevel.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/buffered/buffered-level", data.getPath()))
 	}
 	if !data.EventsPrecfgSuppressionTimeout.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/Cisco-IOS-XR-um-logging-events-cfg:events/precfg-suppression-timeout", data.getPath()))
@@ -3816,11 +3406,11 @@ func (data *Logging) getDeletePaths(ctx context.Context, version string) []strin
 	if !data.Hostnameprefix.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/hostnameprefix", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.HistorySize.IsNull() {
+	if !data.HistorySize.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/history/size", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.History.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/history", data.getPath()))
+	if !data.History.IsNull() {
+		deletePaths = append(deletePaths, fmt.Sprintf("%v/history/level", data.getPath()))
 	}
 	for i := range data.File {
 		keys := [...]string{"file-name"}
@@ -3864,13 +3454,13 @@ func (data *Logging) getDeletePaths(ctx context.Context, version string) []strin
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.BufferedDiscriminatorMatch1.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/buffered/discriminator/match1", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.BufferedLevel.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/buffered/level", data.getPath()))
+	if !data.BufferedLevel.IsNull() {
+		deletePaths = append(deletePaths, fmt.Sprintf("%v/buffered/buffered-level", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.BufferedSize.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/buffered/logging-buffer-size", data.getPath()))
+	if !data.BufferedSize.IsNull() {
+		deletePaths = append(deletePaths, fmt.Sprintf("%v/buffered/log-buffer-size", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.BufferedEntriesCount.IsNull() {
+	if !data.BufferedEntriesCount.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/buffered/entries-count", data.getPath()))
 	}
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.FacilityLevel.IsNull() {
@@ -3939,14 +3529,14 @@ func (data *Logging) getDeletePaths(ctx context.Context, version string) []strin
 	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.ConsoleFacility.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/console-logging/console-log-facility/console-facility-level", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.Monitor.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor", data.getPath()))
+	if !data.Monitor.IsNull() {
+		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/monitor-level", data.getPath()))
 	}
 	if !data.Trap.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/trap", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.Console.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/console", data.getPath()))
+	if !data.Console.IsNull() {
+		deletePaths = append(deletePaths, fmt.Sprintf("%v/console/console-level", data.getPath()))
 	}
 	return deletePaths
 }

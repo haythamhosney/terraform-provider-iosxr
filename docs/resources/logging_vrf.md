@@ -10,6 +10,16 @@ description: |-
 
 This resource can manage the Logging VRF configuration.
 
+## Version Compatibility
+
+### Removed from version
+
+| Attribute | Version |
+|-----------|:-------:|
+| `host_ipv4_addresses` | `25.4` |
+| `host_ipv6_addresses` | `25.4` |
+| `hostnames` | `25.4` |
+
 ## Example Usage
 
 ```terraform
@@ -60,9 +70,12 @@ resource "iosxr_logging_vrf" "example" {
 - `delete_mode` (String) Configure behavior when deleting/destroying the resource. Either delete the entire object (YANG container) being managed, or only delete the individual resource attributes configured explicitly and leave everything else as-is. Default value is `all`.
   - Choices: `all`, `attributes`
 - `device` (String) A device name from the provider configuration.
-- `host_ipv4_addresses` (Attributes List) IPV4 address of the logging host (see [below for nested schema](#nestedatt--host_ipv4_addresses))
-- `host_ipv6_addresses` (Attributes List) IPV6 address of the logging host (see [below for nested schema](#nestedatt--host_ipv6_addresses))
-- `hostnames` (Attributes List) Name of the logging host (see [below for nested schema](#nestedatt--hostnames))
+- `host_ipv4_addresses` (Attributes List) IPV4 address of the logging host
+  - **Not supported from version `25.4` and above** (see [below for nested schema](#nestedatt--host_ipv4_addresses))
+- `host_ipv6_addresses` (Attributes List) IPV6 address of the logging host
+  - **Not supported from version `25.4` and above** (see [below for nested schema](#nestedatt--host_ipv6_addresses))
+- `hostnames` (Attributes List) Name of the logging host
+  - **Not supported from version `25.4` and above** (see [below for nested schema](#nestedatt--hostnames))
 
 ### Read-Only
 

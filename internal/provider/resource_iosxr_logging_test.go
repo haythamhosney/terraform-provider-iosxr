@@ -35,13 +35,9 @@ import (
 
 func TestAccIosxrLogging(t *testing.T) {
 	var checks []resource.TestCheckFunc
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "console", "disable"))
-	}
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "console", "alerts"))
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "trap", "informational"))
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "monitor", "disable"))
-	}
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "monitor", "alerts"))
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "console_facility", "all"))
 	}
@@ -75,15 +71,9 @@ func TestAccIosxrLogging(t *testing.T) {
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "facility_level", "local7"))
 	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "buffered_entries_count", "10000"))
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "buffered_size", "4000000"))
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "buffered_level", "debugging"))
-	}
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "buffered_entries_count", "10000"))
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "buffered_size", "4000000"))
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "buffered_level", "alerts"))
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "buffered_discriminator_match1", "BUFFERED1"))
 	}
@@ -109,15 +99,9 @@ func TestAccIosxrLogging(t *testing.T) {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "container_fetch_timestamp", "true"))
 	}
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.file_name", "logfile1"))
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.path", "/disk0:"))
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.maxfilesize", "1024"))
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.severity", "info"))
-	}
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.path", "/disk0:"))
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.maxfilesize", "1024"))
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.severity", "informational"))
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.local_accounting_send_to_remote_facility_level", "local0"))
 	}
@@ -136,21 +120,8 @@ func TestAccIosxrLogging(t *testing.T) {
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.send_to_remote_facility", "auth"))
 	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.path_maxfilesize", "1024"))
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.path_path_name", "/disk0:"))
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "file.0.path_severity", "informational"))
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "history", "emergencies"))
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "history_size", "500"))
-	}
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "history", "alerts"))
+	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "history_size", "500"))
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "hostnameprefix", "HOSTNAME01"))
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "localfilesize", "1000"))
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
@@ -185,15 +156,6 @@ func TestAccIosxrLogging(t *testing.T) {
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "events_level", "informational"))
 	checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "events_threshold", "80"))
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "buffered_buffered_level", "alerts"))
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "buffered_log_buffer_size", "4000000"))
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "console_console_level", "alerts"))
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "console_discriminator_match1", "MATCH1"))
 	}
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
@@ -213,12 +175,6 @@ func TestAccIosxrLogging(t *testing.T) {
 	}
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "facility_all", "all"))
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "history_level", "alerts"))
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		checks = append(checks, resource.TestCheckResourceAttr("iosxr_logging.test", "monitor_monitor_level", "alerts"))
 	}
 	var steps []resource.TestStep
 	if os.Getenv("SKIP_MINIMUM_TEST") == "" {
@@ -275,13 +231,9 @@ func testAccIosxrLoggingConfig_minimum() string {
 
 func testAccIosxrLoggingConfig_all() string {
 	config := `resource "iosxr_logging" "test" {` + "\n"
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	console = "disable"` + "\n"
-	}
+	config += `	console = "alerts"` + "\n"
 	config += `	trap = "informational"` + "\n"
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	monitor = "disable"` + "\n"
-	}
+	config += `	monitor = "alerts"` + "\n"
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		config += `	console_facility = "all"` + "\n"
 	}
@@ -315,15 +267,9 @@ func testAccIosxrLoggingConfig_all() string {
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		config += `	facility_level = "local7"` + "\n"
 	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	buffered_entries_count = 10000` + "\n"
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	buffered_size = 4000000` + "\n"
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	buffered_level = "debugging"` + "\n"
-	}
+	config += `	buffered_entries_count = 10000` + "\n"
+	config += `	buffered_size = 4000000` + "\n"
+	config += `	buffered_level = "alerts"` + "\n"
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		config += `	buffered_discriminator_match1 = "BUFFERED1"` + "\n"
 	}
@@ -350,15 +296,9 @@ func testAccIosxrLoggingConfig_all() string {
 	}
 	config += `	file = [{` + "\n"
 	config += `		file_name = "logfile1"` + "\n"
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `		path = "/disk0:"` + "\n"
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `		maxfilesize = 1024` + "\n"
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `		severity = "info"` + "\n"
-	}
+	config += `		path = "/disk0:"` + "\n"
+	config += `		maxfilesize = 1024` + "\n"
+	config += `		severity = "informational"` + "\n"
 	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		config += `		local_accounting_send_to_remote_facility_level = "local0"` + "\n"
 	}
@@ -377,22 +317,9 @@ func testAccIosxrLoggingConfig_all() string {
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		config += `		send_to_remote_facility = "auth"` + "\n"
 	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `		path_maxfilesize = 1024` + "\n"
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `		path_path_name = "/disk0:"` + "\n"
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `		path_severity = "informational"` + "\n"
-	}
 	config += `		}]` + "\n"
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	history = "emergencies"` + "\n"
-	}
-	if !iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	history_size = 500` + "\n"
-	}
+	config += `	history = "alerts"` + "\n"
+	config += `	history_size = 500` + "\n"
 	config += `	hostnameprefix = "HOSTNAME01"` + "\n"
 	config += `	localfilesize = 1000` + "\n"
 	config += `	source_interfaces = [{` + "\n"
@@ -437,15 +364,6 @@ func testAccIosxrLoggingConfig_all() string {
 	config += `	events_level = "informational"` + "\n"
 	config += `	events_threshold = 80` + "\n"
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	buffered_buffered_level = "alerts"` + "\n"
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	buffered_log_buffer_size = 4000000` + "\n"
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	console_console_level = "alerts"` + "\n"
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		config += `	console_discriminator_match1 = "MATCH1"` + "\n"
 	}
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
@@ -465,12 +383,6 @@ func testAccIosxrLoggingConfig_all() string {
 	}
 	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
 		config += `	facility_all = "all"` + "\n"
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	history_level = "alerts"` + "\n"
-	}
-	if iosxrVersionAtLeast(os.Getenv("IOSXR_VERSION"), "25.4") {
-		config += `	monitor_monitor_level = "alerts"` + "\n"
 	}
 	config += `}` + "\n"
 	return config

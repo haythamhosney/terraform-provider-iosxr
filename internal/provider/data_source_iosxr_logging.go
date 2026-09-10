@@ -68,7 +68,7 @@ func (d *LoggingDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 				Computed:            true,
 			},
 			"console": schema.StringAttribute{
-				MarkdownDescription: "Set console logging",
+				MarkdownDescription: "console level",
 				Computed:            true,
 			},
 			"trap": schema.StringAttribute{
@@ -176,7 +176,7 @@ func (d *LoggingDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 				Computed:            true,
 			},
 			"buffered_level": schema.StringAttribute{
-				MarkdownDescription: "configure this node",
+				MarkdownDescription: "buffered level",
 				Computed:            true,
 			},
 			"buffered_discriminator_match1": schema.StringAttribute{
@@ -221,7 +221,7 @@ func (d *LoggingDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 							Computed:            true,
 						},
 						"path": schema.StringAttribute{
-							MarkdownDescription: "Set file path ",
+							MarkdownDescription: "File path (e.g. /disk0: )",
 							Computed:            true,
 						},
 						"maxfilesize": schema.Int64Attribute{
@@ -229,7 +229,7 @@ func (d *LoggingDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 							Computed:            true,
 						},
 						"severity": schema.StringAttribute{
-							MarkdownDescription: "Set severity level",
+							MarkdownDescription: "severity",
 							Computed:            true,
 						},
 						"local_accounting_send_to_remote_facility_level": schema.StringAttribute{
@@ -272,23 +272,11 @@ func (d *LoggingDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 							MarkdownDescription: "Modify message logging facilities",
 							Computed:            true,
 						},
-						"path_maxfilesize": schema.Int64Attribute{
-							MarkdownDescription: "Set max file size",
-							Computed:            true,
-						},
-						"path_path_name": schema.StringAttribute{
-							MarkdownDescription: "File path (e.g. /disk0: )",
-							Computed:            true,
-						},
-						"path_severity": schema.StringAttribute{
-							MarkdownDescription: "severity",
-							Computed:            true,
-						},
 					},
 				},
 			},
 			"history": schema.StringAttribute{
-				MarkdownDescription: "Set history logging",
+				MarkdownDescription: "history level",
 				Computed:            true,
 			},
 			"history_size": schema.Int64Attribute{
@@ -439,18 +427,6 @@ func (d *LoggingDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 				MarkdownDescription: "Timeout (in minutes) for pre-config events suppression (default 15)",
 				Computed:            true,
 			},
-			"buffered_buffered_level": schema.StringAttribute{
-				MarkdownDescription: "buffered level",
-				Computed:            true,
-			},
-			"buffered_log_buffer_size": schema.Int64Attribute{
-				MarkdownDescription: "Logging buffer size",
-				Computed:            true,
-			},
-			"console_console_level": schema.StringAttribute{
-				MarkdownDescription: "console level",
-				Computed:            true,
-			},
 			"console_discriminator_match1": schema.StringAttribute{
 				MarkdownDescription: "Set match discriminator 1",
 				Computed:            true,
@@ -477,14 +453,6 @@ func (d *LoggingDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 			},
 			"facility_all": schema.StringAttribute{
 				MarkdownDescription: "All supported facilities",
-				Computed:            true,
-			},
-			"history_level": schema.StringAttribute{
-				MarkdownDescription: "history level",
-				Computed:            true,
-			},
-			"monitor_monitor_level": schema.StringAttribute{
-				MarkdownDescription: "Set monitor logging",
 				Computed:            true,
 			},
 		},

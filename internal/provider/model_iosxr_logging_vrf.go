@@ -99,7 +99,7 @@ func (data LoggingVRF) toBody(ctx context.Context, providerVersion string) strin
 	if !data.VrfName.IsNull() && !data.VrfName.IsUnknown() {
 		body, _ = sjson.Set(body, "vrf-name", data.VrfName.ValueString())
 	}
-	if len(data.Hostnames) > 0 {
+	if (providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4")) && len(data.Hostnames) > 0 {
 		body, _ = sjson.Set(body, "host-names.host-name", []interface{}{})
 		for index, item := range data.Hostnames {
 			if !item.Name.IsNull() && !item.Name.IsUnknown() {
@@ -122,7 +122,7 @@ func (data LoggingVRF) toBody(ctx context.Context, providerVersion string) strin
 			}
 		}
 	}
-	if len(data.HostIpv4Addresses) > 0 {
+	if (providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4")) && len(data.HostIpv4Addresses) > 0 {
 		body, _ = sjson.Set(body, "host-ipv4-addresses.host-ipv4-address", []interface{}{})
 		for index, item := range data.HostIpv4Addresses {
 			if !item.Ipv4Address.IsNull() && !item.Ipv4Address.IsUnknown() {
@@ -145,7 +145,7 @@ func (data LoggingVRF) toBody(ctx context.Context, providerVersion string) strin
 			}
 		}
 	}
-	if len(data.HostIpv6Addresses) > 0 {
+	if (providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4")) && len(data.HostIpv6Addresses) > 0 {
 		body, _ = sjson.Set(body, "host-ipv6-addresses.host-ipv6-address", []interface{}{})
 		for index, item := range data.HostIpv6Addresses {
 			if !item.Ipv6Address.IsNull() && !item.Ipv6Address.IsUnknown() {
@@ -179,6 +179,23 @@ func (data LoggingVRF) toBody(ctx context.Context, providerVersion string) strin
 func (data LoggingVRF) GetVersionConstraints() []helpers.FieldVersionConstraint {
 	constraints := make([]helpers.FieldVersionConstraint, 0)
 
+	constraints = append(constraints, []helpers.FieldVersionConstraint{
+		{
+			FieldPath: "hostnames",
+
+			RemovedInVersion: "25.4",
+		},
+		{
+			FieldPath: "host_ipv4_addresses",
+
+			RemovedInVersion: "25.4",
+		},
+		{
+			FieldPath: "host_ipv6_addresses",
+
+			RemovedInVersion: "25.4",
+		},
+	}...)
 	if len(constraints) == 0 {
 		return nil
 	}
@@ -568,139 +585,145 @@ func (data *LoggingVRFData) fromBody(ctx context.Context, res []byte, version st
 
 func (data *LoggingVRF) getDeletedItems(ctx context.Context, state LoggingVRF, version string) []string {
 	deletedItems := make([]string, 0)
-	for i := range state.HostIpv6Addresses {
-		keys := [...]string{"ipv6-address"}
-		stateKeyValues := [...]string{state.HostIpv6Addresses[i].Ipv6Address.ValueString()}
-		keyString := ""
-		for ki := range keys {
-			keyString += "[" + keys[ki] + "=" + stateKeyValues[ki] + "]"
-		}
-
-		emptyKeys := true
-		if !reflect.ValueOf(state.HostIpv6Addresses[i].Ipv6Address.ValueString()).IsZero() {
-			emptyKeys = false
-		}
-		if emptyKeys {
-			continue
-		}
-
-		found := false
-		for j := range data.HostIpv6Addresses {
-			found = true
-			if state.HostIpv6Addresses[i].Ipv6Address.ValueString() != data.HostIpv6Addresses[j].Ipv6Address.ValueString() {
-				found = false
+	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
+		for i := range state.HostIpv6Addresses {
+			keys := [...]string{"ipv6-address"}
+			stateKeyValues := [...]string{state.HostIpv6Addresses[i].Ipv6Address.ValueString()}
+			keyString := ""
+			for ki := range keys {
+				keyString += "[" + keys[ki] + "=" + stateKeyValues[ki] + "]"
 			}
-			if found {
-				if !state.HostIpv6Addresses[i].Ipv6SourceAddress.IsNull() && data.HostIpv6Addresses[j].Ipv6SourceAddress.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/ipv6-source-address", state.getPath(), keyString))
-				}
-				if !state.HostIpv6Addresses[i].Facility.IsNull() && data.HostIpv6Addresses[j].Facility.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/facility", state.getPath(), keyString))
-				}
-				if !state.HostIpv6Addresses[i].Operator.IsNull() && data.HostIpv6Addresses[j].Operator.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/operator", state.getPath(), keyString))
-				}
-				if !state.HostIpv6Addresses[i].Port.IsNull() && data.HostIpv6Addresses[j].Port.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/port", state.getPath(), keyString))
-				}
-				if !state.HostIpv6Addresses[i].Severity.IsNull() && data.HostIpv6Addresses[j].Severity.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/severity", state.getPath(), keyString))
-				}
-				break
+
+			emptyKeys := true
+			if !reflect.ValueOf(state.HostIpv6Addresses[i].Ipv6Address.ValueString()).IsZero() {
+				emptyKeys = false
 			}
-		}
-		if !found {
-			deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v", state.getPath(), keyString))
+			if emptyKeys {
+				continue
+			}
+
+			found := false
+			for j := range data.HostIpv6Addresses {
+				found = true
+				if state.HostIpv6Addresses[i].Ipv6Address.ValueString() != data.HostIpv6Addresses[j].Ipv6Address.ValueString() {
+					found = false
+				}
+				if found {
+					if !state.HostIpv6Addresses[i].Ipv6SourceAddress.IsNull() && data.HostIpv6Addresses[j].Ipv6SourceAddress.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/ipv6-source-address", state.getPath(), keyString))
+					}
+					if !state.HostIpv6Addresses[i].Facility.IsNull() && data.HostIpv6Addresses[j].Facility.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/facility", state.getPath(), keyString))
+					}
+					if !state.HostIpv6Addresses[i].Operator.IsNull() && data.HostIpv6Addresses[j].Operator.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/operator", state.getPath(), keyString))
+					}
+					if !state.HostIpv6Addresses[i].Port.IsNull() && data.HostIpv6Addresses[j].Port.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/port", state.getPath(), keyString))
+					}
+					if !state.HostIpv6Addresses[i].Severity.IsNull() && data.HostIpv6Addresses[j].Severity.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v/severity", state.getPath(), keyString))
+					}
+					break
+				}
+			}
+			if !found {
+				deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v", state.getPath(), keyString))
+			}
 		}
 	}
-	for i := range state.HostIpv4Addresses {
-		keys := [...]string{"ipv4-address"}
-		stateKeyValues := [...]string{state.HostIpv4Addresses[i].Ipv4Address.ValueString()}
-		keyString := ""
-		for ki := range keys {
-			keyString += "[" + keys[ki] + "=" + stateKeyValues[ki] + "]"
-		}
-
-		emptyKeys := true
-		if !reflect.ValueOf(state.HostIpv4Addresses[i].Ipv4Address.ValueString()).IsZero() {
-			emptyKeys = false
-		}
-		if emptyKeys {
-			continue
-		}
-
-		found := false
-		for j := range data.HostIpv4Addresses {
-			found = true
-			if state.HostIpv4Addresses[i].Ipv4Address.ValueString() != data.HostIpv4Addresses[j].Ipv4Address.ValueString() {
-				found = false
+	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
+		for i := range state.HostIpv4Addresses {
+			keys := [...]string{"ipv4-address"}
+			stateKeyValues := [...]string{state.HostIpv4Addresses[i].Ipv4Address.ValueString()}
+			keyString := ""
+			for ki := range keys {
+				keyString += "[" + keys[ki] + "=" + stateKeyValues[ki] + "]"
 			}
-			if found {
-				if !state.HostIpv4Addresses[i].Ipv4SourceAddress.IsNull() && data.HostIpv4Addresses[j].Ipv4SourceAddress.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/ipv4-source-address", state.getPath(), keyString))
-				}
-				if !state.HostIpv4Addresses[i].Facility.IsNull() && data.HostIpv4Addresses[j].Facility.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/facility", state.getPath(), keyString))
-				}
-				if !state.HostIpv4Addresses[i].Operator.IsNull() && data.HostIpv4Addresses[j].Operator.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/operator", state.getPath(), keyString))
-				}
-				if !state.HostIpv4Addresses[i].Port.IsNull() && data.HostIpv4Addresses[j].Port.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/port", state.getPath(), keyString))
-				}
-				if !state.HostIpv4Addresses[i].Severity.IsNull() && data.HostIpv4Addresses[j].Severity.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/severity", state.getPath(), keyString))
-				}
-				break
+
+			emptyKeys := true
+			if !reflect.ValueOf(state.HostIpv4Addresses[i].Ipv4Address.ValueString()).IsZero() {
+				emptyKeys = false
 			}
-		}
-		if !found {
-			deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v", state.getPath(), keyString))
+			if emptyKeys {
+				continue
+			}
+
+			found := false
+			for j := range data.HostIpv4Addresses {
+				found = true
+				if state.HostIpv4Addresses[i].Ipv4Address.ValueString() != data.HostIpv4Addresses[j].Ipv4Address.ValueString() {
+					found = false
+				}
+				if found {
+					if !state.HostIpv4Addresses[i].Ipv4SourceAddress.IsNull() && data.HostIpv4Addresses[j].Ipv4SourceAddress.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/ipv4-source-address", state.getPath(), keyString))
+					}
+					if !state.HostIpv4Addresses[i].Facility.IsNull() && data.HostIpv4Addresses[j].Facility.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/facility", state.getPath(), keyString))
+					}
+					if !state.HostIpv4Addresses[i].Operator.IsNull() && data.HostIpv4Addresses[j].Operator.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/operator", state.getPath(), keyString))
+					}
+					if !state.HostIpv4Addresses[i].Port.IsNull() && data.HostIpv4Addresses[j].Port.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/port", state.getPath(), keyString))
+					}
+					if !state.HostIpv4Addresses[i].Severity.IsNull() && data.HostIpv4Addresses[j].Severity.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v/severity", state.getPath(), keyString))
+					}
+					break
+				}
+			}
+			if !found {
+				deletedItems = append(deletedItems, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v", state.getPath(), keyString))
+			}
 		}
 	}
-	for i := range state.Hostnames {
-		keys := [...]string{"name"}
-		stateKeyValues := [...]string{state.Hostnames[i].Name.ValueString()}
-		keyString := ""
-		for ki := range keys {
-			keyString += "[" + keys[ki] + "=" + stateKeyValues[ki] + "]"
-		}
-
-		emptyKeys := true
-		if !reflect.ValueOf(state.Hostnames[i].Name.ValueString()).IsZero() {
-			emptyKeys = false
-		}
-		if emptyKeys {
-			continue
-		}
-
-		found := false
-		for j := range data.Hostnames {
-			found = true
-			if state.Hostnames[i].Name.ValueString() != data.Hostnames[j].Name.ValueString() {
-				found = false
+	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
+		for i := range state.Hostnames {
+			keys := [...]string{"name"}
+			stateKeyValues := [...]string{state.Hostnames[i].Name.ValueString()}
+			keyString := ""
+			for ki := range keys {
+				keyString += "[" + keys[ki] + "=" + stateKeyValues[ki] + "]"
 			}
-			if found {
-				if !state.Hostnames[i].HostnameSourceAddress.IsNull() && data.Hostnames[j].HostnameSourceAddress.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/hostname-source-address", state.getPath(), keyString))
-				}
-				if !state.Hostnames[i].Facility.IsNull() && data.Hostnames[j].Facility.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/facility", state.getPath(), keyString))
-				}
-				if !state.Hostnames[i].Operator.IsNull() && data.Hostnames[j].Operator.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/operator", state.getPath(), keyString))
-				}
-				if !state.Hostnames[i].Port.IsNull() && data.Hostnames[j].Port.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/port", state.getPath(), keyString))
-				}
-				if !state.Hostnames[i].Severity.IsNull() && data.Hostnames[j].Severity.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/severity", state.getPath(), keyString))
-				}
-				break
+
+			emptyKeys := true
+			if !reflect.ValueOf(state.Hostnames[i].Name.ValueString()).IsZero() {
+				emptyKeys = false
 			}
-		}
-		if !found {
-			deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v", state.getPath(), keyString))
+			if emptyKeys {
+				continue
+			}
+
+			found := false
+			for j := range data.Hostnames {
+				found = true
+				if state.Hostnames[i].Name.ValueString() != data.Hostnames[j].Name.ValueString() {
+					found = false
+				}
+				if found {
+					if !state.Hostnames[i].HostnameSourceAddress.IsNull() && data.Hostnames[j].HostnameSourceAddress.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/hostname-source-address", state.getPath(), keyString))
+					}
+					if !state.Hostnames[i].Facility.IsNull() && data.Hostnames[j].Facility.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/facility", state.getPath(), keyString))
+					}
+					if !state.Hostnames[i].Operator.IsNull() && data.Hostnames[j].Operator.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/operator", state.getPath(), keyString))
+					}
+					if !state.Hostnames[i].Port.IsNull() && data.Hostnames[j].Port.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/port", state.getPath(), keyString))
+					}
+					if !state.Hostnames[i].Severity.IsNull() && data.Hostnames[j].Severity.IsNull() {
+						deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v/severity", state.getPath(), keyString))
+					}
+					break
+				}
+			}
+			if !found {
+				deletedItems = append(deletedItems, fmt.Sprintf("%v/host-names/host-name%v", state.getPath(), keyString))
+			}
 		}
 	}
 	return deletedItems
@@ -712,28 +735,34 @@ func (data *LoggingVRF) getDeletedItems(ctx context.Context, state LoggingVRF, v
 
 func (data *LoggingVRF) getEmptyLeafsDelete(ctx context.Context, version string) []string {
 	emptyLeafsDelete := make([]string, 0)
-	for i := range data.HostIpv6Addresses {
-		keys := [...]string{"ipv6-address"}
-		keyValues := [...]string{data.HostIpv6Addresses[i].Ipv6Address.ValueString()}
-		keyString := ""
-		for ki := range keys {
-			keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
+	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
+		for i := range data.HostIpv6Addresses {
+			keys := [...]string{"ipv6-address"}
+			keyValues := [...]string{data.HostIpv6Addresses[i].Ipv6Address.ValueString()}
+			keyString := ""
+			for ki := range keys {
+				keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
+			}
 		}
 	}
-	for i := range data.HostIpv4Addresses {
-		keys := [...]string{"ipv4-address"}
-		keyValues := [...]string{data.HostIpv4Addresses[i].Ipv4Address.ValueString()}
-		keyString := ""
-		for ki := range keys {
-			keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
+	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
+		for i := range data.HostIpv4Addresses {
+			keys := [...]string{"ipv4-address"}
+			keyValues := [...]string{data.HostIpv4Addresses[i].Ipv4Address.ValueString()}
+			keyString := ""
+			for ki := range keys {
+				keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
+			}
 		}
 	}
-	for i := range data.Hostnames {
-		keys := [...]string{"name"}
-		keyValues := [...]string{data.Hostnames[i].Name.ValueString()}
-		keyString := ""
-		for ki := range keys {
-			keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
+	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
+		for i := range data.Hostnames {
+			keys := [...]string{"name"}
+			keyValues := [...]string{data.Hostnames[i].Name.ValueString()}
+			keyString := ""
+			for ki := range keys {
+				keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
+			}
 		}
 	}
 	return emptyLeafsDelete
@@ -744,59 +773,65 @@ func (data *LoggingVRF) getEmptyLeafsDelete(ctx context.Context, version string)
 // Section below is generated&owned by "gen/generator.go". //template:begin getDeletePaths
 func (data *LoggingVRF) getDeletePaths(ctx context.Context, version string) []string {
 	var deletePaths []string
-	for i := range data.HostIpv6Addresses {
-		keys := [...]string{"ipv6-address"}
-		keyValues := [...]string{data.HostIpv6Addresses[i].Ipv6Address.ValueString()}
+	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
+		for i := range data.HostIpv6Addresses {
+			keys := [...]string{"ipv6-address"}
+			keyValues := [...]string{data.HostIpv6Addresses[i].Ipv6Address.ValueString()}
 
-		keyString := ""
-		for ki := range keys {
-			keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
-		}
+			keyString := ""
+			for ki := range keys {
+				keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
+			}
 
-		emptyKeys := true
-		if !reflect.ValueOf(data.HostIpv6Addresses[i].Ipv6Address.ValueString()).IsZero() {
-			emptyKeys = false
+			emptyKeys := true
+			if !reflect.ValueOf(data.HostIpv6Addresses[i].Ipv6Address.ValueString()).IsZero() {
+				emptyKeys = false
+			}
+			if emptyKeys {
+				continue
+			}
+			deletePaths = append(deletePaths, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v", data.getPath(), keyString))
 		}
-		if emptyKeys {
-			continue
-		}
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/host-ipv6-addresses/host-ipv6-address%v", data.getPath(), keyString))
 	}
-	for i := range data.HostIpv4Addresses {
-		keys := [...]string{"ipv4-address"}
-		keyValues := [...]string{data.HostIpv4Addresses[i].Ipv4Address.ValueString()}
+	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
+		for i := range data.HostIpv4Addresses {
+			keys := [...]string{"ipv4-address"}
+			keyValues := [...]string{data.HostIpv4Addresses[i].Ipv4Address.ValueString()}
 
-		keyString := ""
-		for ki := range keys {
-			keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
-		}
+			keyString := ""
+			for ki := range keys {
+				keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
+			}
 
-		emptyKeys := true
-		if !reflect.ValueOf(data.HostIpv4Addresses[i].Ipv4Address.ValueString()).IsZero() {
-			emptyKeys = false
+			emptyKeys := true
+			if !reflect.ValueOf(data.HostIpv4Addresses[i].Ipv4Address.ValueString()).IsZero() {
+				emptyKeys = false
+			}
+			if emptyKeys {
+				continue
+			}
+			deletePaths = append(deletePaths, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v", data.getPath(), keyString))
 		}
-		if emptyKeys {
-			continue
-		}
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/host-ipv4-addresses/host-ipv4-address%v", data.getPath(), keyString))
 	}
-	for i := range data.Hostnames {
-		keys := [...]string{"name"}
-		keyValues := [...]string{data.Hostnames[i].Name.ValueString()}
+	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
+		for i := range data.Hostnames {
+			keys := [...]string{"name"}
+			keyValues := [...]string{data.Hostnames[i].Name.ValueString()}
 
-		keyString := ""
-		for ki := range keys {
-			keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
-		}
+			keyString := ""
+			for ki := range keys {
+				keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
+			}
 
-		emptyKeys := true
-		if !reflect.ValueOf(data.Hostnames[i].Name.ValueString()).IsZero() {
-			emptyKeys = false
+			emptyKeys := true
+			if !reflect.ValueOf(data.Hostnames[i].Name.ValueString()).IsZero() {
+				emptyKeys = false
+			}
+			if emptyKeys {
+				continue
+			}
+			deletePaths = append(deletePaths, fmt.Sprintf("%v/host-names/host-name%v", data.getPath(), keyString))
 		}
-		if emptyKeys {
-			continue
-		}
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/host-names/host-name%v", data.getPath(), keyString))
 	}
 	return deletePaths
 }

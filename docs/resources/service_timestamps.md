@@ -10,6 +10,15 @@ description: |-
 
 This resource can manage the Service Timestamps configuration.
 
+## Version Compatibility
+
+### Removed from version
+
+| Attribute | Version |
+|-----------|:-------:|
+| `debug_datetime_localtime_only` | `25.4` |
+| `log_datetime_localtime_only` | `25.4` |
+
 ## Example Usage
 
 ```terraform

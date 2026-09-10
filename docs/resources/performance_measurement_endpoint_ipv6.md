@@ -10,6 +10,14 @@ description: |-
 
 This resource can manage the Performance Measurement Endpoint IPv6 configuration.
 
+## Version Compatibility
+
+### Removed from version
+
+| Attribute | Version |
+|-----------|:-------:|
+| `liveness_detection_collect_hbh` | `25.4` |
+
 ## Example Usage
 
 ```terraform

@@ -175,6 +175,10 @@ type YamlConfigAttribute struct {
 	VersionStringLengths map[string]StringLengthConstraint // Version-specific string length constraints (nil if same across all versions)
 	VersionPatterns      map[string][]string               // Version-specific string patterns (nil if same across all versions)
 	VersionDefaults      map[string]string                 // Version-specific default values (nil if same across all versions)
+	ReplacesYangName string            `yaml:"replaces_yang_name"`
+	ReplacesXPath    string            // preserved from base XPath before it is cleared
+	VersionYangNames map[string]string // computed during merge: version → yang_name
+	MovedInVersion   string            // earliest version with new path (derived in fixAttributeBaseVersion)
 	Attributes        []YamlConfigAttribute      `yaml:"attributes"`
 }
 
@@ -255,6 +259,20 @@ func ToJsonPath(yangPath, xPath string) string {
 		parts[i] = strings.ReplaceAll(part, ".", "\\\\.")
 	}
 	return strings.Join(parts, ".")
+}
+
+// JsonPathExpr returns a Go expression string for the gNMI JSON path of an attribute.
+// For static attributes it returns a quoted string literal (e.g. "files.file").
+// For attributes with a renamed YANG path it returns a helpers.SelectYangPath(...) call
+// so the correct path is chosen at runtime based on the device version.
+func JsonPathExpr(attr YamlConfigAttribute, versionVar string) string {
+	path := ToJsonPath(attr.YangName, attr.XPath)
+	if len(attr.VersionYangNames) == 0 {
+		return fmt.Sprintf("%q", path)
+	}
+	old := ToJsonPath(attr.ReplacesYangName, attr.ReplacesXPath)
+	return fmt.Sprintf(`helpers.SelectYangPath(%s, %q, %q, %q)`,
+		versionVar, path, old, attr.MovedInVersion)
 }
 
 // Templating helper function to convert string to camel case
@@ -463,6 +481,9 @@ func hasAttributeVersionDifferences(attributes []YamlConfigAttribute) bool {
 			return true
 		}
 		if attr.VersionRanges != nil && len(attr.VersionRanges) > 0 {
+			return true
+		}
+		if len(attr.VersionYangNames) > 0 {
 			return true
 		}
 		if len(attr.Attributes) > 0 && hasAttributeVersionDifferences(attr.Attributes) {
@@ -889,6 +910,7 @@ func FormatVersionDefaults(versionDefaults map[string]string) string {
 var functions = template.FuncMap{
 	"toGoName":                       ToGoName,
 	"toJsonPath":                     ToJsonPath,
+	"jsonPathExpr":                   JsonPathExpr,
 	"camelCase":                      CamelCase,
 	"snakeCase":                      SnakeCase,
 	"versionSuffix":                  VersionSuffix,
@@ -1315,9 +1337,13 @@ func mergeAttributes(base, override []YamlConfigAttribute, overrideVersion strin
 	for _, newAttr := range override {
 		found := false
 		for i := range result {
-			// Match by yang_name or tf_name
+			// Match by yang_name, tf_name, or replaces_yang_name (for YANG path renames)
 			if result[i].YangName == newAttr.YangName ||
-				(result[i].TfName != "" && newAttr.TfName != "" && result[i].TfName == newAttr.TfName) {
+				(result[i].TfName != "" && newAttr.TfName != "" && result[i].TfName == newAttr.TfName) ||
+				(newAttr.ReplacesYangName != "" && result[i].YangName == newAttr.ReplacesYangName) {
+				if newAttr.ReplacesYangName != "" && newAttr.Legacy {
+					log.Fatalf("attribute %q: replaces_yang_name and legacy cannot both be set", newAttr.TfName)
+				}
 				// Legacy: true means this attribute is removed in the override version
 				// Instead of dropping it, mark it with RemovedInVersion for validation
 				if newAttr.Legacy {
@@ -1342,6 +1368,9 @@ func mergeAttributes(base, override []YamlConfigAttribute, overrideVersion strin
 						}
 					}
 				}
+
+				// Snapshot the original XPath before any overrides, for use as ReplacesXPath
+				originalXPath := result[i].XPath
 
 				// Override all other fields from new attribute
 				if newAttr.YangScope != "" {
@@ -1519,6 +1548,21 @@ func mergeAttributes(base, override []YamlConfigAttribute, overrideVersion strin
 					result[i].MinimumTestValue = newAttr.MinimumTestValue
 				}
 
+				if newAttr.ReplacesYangName != "" {
+					if result[i].Id {
+						log.Fatalf("replaces_yang_name on attribute %q: key attributes (id: true) are not supported", newAttr.TfName)
+					}
+					if result[i].VersionYangNames == nil {
+						result[i].VersionYangNames = make(map[string]string)
+						result[i].VersionYangNames["_base"] = result[i].YangName
+						result[i].ReplacesYangName = newAttr.ReplacesYangName
+						result[i].ReplacesXPath = originalXPath
+					}
+					result[i].VersionYangNames[overrideVersion] = newAttr.YangName
+					result[i].YangName = newAttr.YangName
+					result[i].XPath = ""
+				}
+
 				found = true
 				break
 			}
@@ -1527,6 +1571,10 @@ func mergeAttributes(base, override []YamlConfigAttribute, overrideVersion strin
 			// Skip legacy attributes that don't exist in the base — nothing to remove
 			if newAttr.Legacy {
 				continue
+			}
+			if newAttr.ReplacesYangName != "" {
+				log.Fatalf("replaces_yang_name %q on attribute %q not found in base definition",
+					newAttr.ReplacesYangName, newAttr.TfName)
 			}
 			// Add new attribute and mark with version
 			newAttr.AddedInVersion = overrideVersion
@@ -1586,6 +1634,17 @@ func fixAttributeBaseVersion(attr *YamlConfigAttribute, baseVersion string) {
 		if base, exists := attr.VersionDefaults["_base"]; exists {
 			delete(attr.VersionDefaults, "_base")
 			attr.VersionDefaults[baseVersion] = base
+		}
+	}
+	if attr.VersionYangNames != nil {
+		if base, ok := attr.VersionYangNames["_base"]; ok {
+			delete(attr.VersionYangNames, "_base")
+			attr.VersionYangNames[baseVersion] = base
+			for v := range attr.VersionYangNames {
+				if v != baseVersion && (attr.MovedInVersion == "" || v < attr.MovedInVersion) {
+					attr.MovedInVersion = v
+				}
+			}
 		}
 	}
 	for i := range attr.Attributes {

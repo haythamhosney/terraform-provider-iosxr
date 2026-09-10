@@ -11,7 +11,8 @@ attributes:
 
   ## buffered: sibling renames ##
   - yang_name: buffered/buffered-level
-    tf_name: buffered_buffered_level
+    tf_name: buffered_level
+    replaces_yang_name: buffered/level
     description: "buffered level"
     type: String
     enum_values:
@@ -26,28 +27,25 @@ attributes:
     example: alerts
   - yang_name: buffered/entries-count
     tf_name: buffered_entries_count
+    replaces_yang_name: buffered/buffered-entries/count
     description: "Syslog in buffer"
     type: Int64
     min_int: 2545
     max_int: 151699
     example: 10000
   - yang_name: buffered/log-buffer-size
-    tf_name: buffered_log_buffer_size
+    tf_name: buffered_size
+    replaces_yang_name: buffered/logging-buffer-size
     description: "Logging buffer size"
     type: Int64
     min_int: 2097152
     max_int: 125000000
     example: 4000000
-  - yang_name: buffered/level
-    legacy: true  # replaced by buffered/buffered-level
-  - yang_name: buffered/buffered-entries/count
-    legacy: true  # replaced by buffered/entries-count
-  - yang_name: buffered/logging-buffer-size
-    legacy: true  # replaced by buffered/log-buffer-size
 
   ## console: leaf→container restructure ##
   - yang_name: console/console-level
-    tf_name: console_console_level
+    tf_name: console
+    replaces_yang_name: console
     description: "console level"
     type: String
     enum_values:
@@ -98,12 +96,10 @@ attributes:
     enum_values:
       - all
     example: all
-  - yang_name: console
-    legacy: true  # was leaf, now container; replaced by console/console-level
-
   ## history: leaf→container restructure ##
   - yang_name: history/level
-    tf_name: history_level
+    tf_name: history
+    replaces_yang_name: history
     description: "history level"
     type: String
     enum_values:
@@ -119,14 +115,12 @@ attributes:
     example: alerts
   - yang_name: history/size
     tf_name: history_size
+    replaces_yang_name: history-size
     description: "Logging history size"
     type: Int64
     min_int: 1
     max_int: 500
     example: 500
-  - yang_name: history
-    legacy: true  # was leaf, now container; replaced by history/level + history/size
-
   ## monitor: leaf→container restructure ##
   - yang_name: monitor/discriminator/match1
     tf_name: monitor_discriminator_match1
@@ -159,7 +153,8 @@ attributes:
     type: String
     example: NOMATCH3
   - yang_name: monitor/monitor-level
-    tf_name: monitor_monitor_level
+    tf_name: monitor
+    replaces_yang_name: monitor
     description: "Set monitor logging"
     type: String
     enum_values:
@@ -173,9 +168,6 @@ attributes:
       - notifications
       - warning
     example: alerts
-  - yang_name: monitor
-    legacy: true  # was leaf, now container; replaced by monitor/monitor-level
-
   ## files/file: path leaf→container restructure ##
   - yang_name: files/file
     tf_name: file
@@ -219,19 +211,22 @@ attributes:
           - uucp
         example: auth
       - yang_name: path/maxfilesize
-        tf_name: path_maxfilesize
+        tf_name: maxfilesize
+        replaces_yang_name: maxfilesize
         description: "Set max file size"
         type: Int64
         min_int: 1
         max_int: 2097152
         example: 1024
       - yang_name: path/path-name
-        tf_name: path_path_name
+        tf_name: path
+        replaces_yang_name: path
         description: "File path (e.g. /disk0: )"
         type: String
         example: "/disk0:"
       - yang_name: path/severity
-        tf_name: path_severity
+        tf_name: severity
+        replaces_yang_name: severity
         description: "severity"
         type: String
         enum_values:
@@ -247,12 +242,6 @@ attributes:
         example: informational
       - yang_name: local-accounting/send-to-remote/facility/level
         legacy: true  # replaced by path/local-accounting/send-to-remote/facility
-      - yang_name: maxfilesize
-        legacy: true  # replaced by path/maxfilesize
-      - yang_name: path
-        legacy: true  # was leaf, now container; replaced by path/path-name
-      - yang_name: severity
-        legacy: true  # replaced by path/severity
 
   ## source-interfaces: key renames ##
   - yang_name: source-interfaces/source-interface
@@ -326,8 +315,6 @@ attributes:
   - yang_name: format/bsd
     legacy: true
   - yang_name: format/rfc5424
-    legacy: true
-  - yang_name: history-size
     legacy: true
   - yang_name: ipv4/dscp
     legacy: true

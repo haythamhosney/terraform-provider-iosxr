@@ -130,24 +130,27 @@ func DetectIosxrVersion(ctx context.Context, client *gnmi.Client, deviceName str
 
 	tflog.Debug(ctx, fmt.Sprintf("Attempting to auto-detect IOS-XR version for device '%s'", deviceName))
 
-	// First try: gNMI Capabilities Version field
-	version, err := detectFromCapabilities(ctx, client)
-	if err == nil && version != "" {
-		if compact, ok := ParseVersion(version); ok {
-			tflog.Info(ctx, fmt.Sprintf("Auto-detected IOS-XR version for device '%s' from gNMI capabilities: %s", deviceName, version))
-			versionCache.Store(deviceName, compact)
-			return compact, nil
-		}
-	}
-	tflog.Debug(ctx, fmt.Sprintf("Failed to detect version from capabilities: %v", err))
+	// Note: gNMI Capabilities Version field is skipped — IOS-XR returns the gNMI
+	// library version there, not the OS version. Uncomment the block below if a
+	// future IOS-XR release populates caps.Version with the OS version correctly.
+	//
+	// version, err := detectFromCapabilities(ctx, client)
+	// if err == nil && version != "" {
+	// 	if compact, ok := ParseVersion(version); ok {
+	// 		tflog.Info(ctx, fmt.Sprintf("Auto-detected IOS-XR version for device '%s' from gNMI capabilities: %s", deviceName, version))
+	// 		versionCache.Store(deviceName, compact)
+	// 		return compact, nil
+	// 	}
+	// }
+	// tflog.Debug(ctx, fmt.Sprintf("Failed to detect version from capabilities: %v", err))
 
-	// Second try: CLI configuration path - most reliable
+	// CLI configuration path - most reliable version source
 	result, err := client.Get(ctx, []string{"/Cisco-IOS-XR-cli-cfg:cli"})
 	if err != nil {
 		return "", fmt.Errorf("unable to auto-detect IOS-XR version from device: %w", err)
 	}
 
-	version, err = extractVersionFromResponse(ctx, result)
+	version, err := extractVersionFromResponse(ctx, result)
 	if err != nil {
 		return "", fmt.Errorf("unable to auto-detect IOS-XR version from device: %w", err)
 	}
@@ -162,33 +165,33 @@ func DetectIosxrVersion(ctx context.Context, client *gnmi.Client, deviceName str
 	return compact, nil
 }
 
-// detectFromCapabilities tries to extract version from gNMI Capabilities response
-// Note: This rarely succeeds - the CLI config path is the reliable method
-func detectFromCapabilities(ctx context.Context, client *gnmi.Client) (string, error) {
-	tflog.Debug(ctx, "Trying to detect version from gNMI Capabilities")
-
-	// Get capabilities
-	caps, err := client.Capabilities(ctx)
-	if err != nil {
-		return "", fmt.Errorf("failed to get capabilities: %w", err)
-	}
-
-	// Try to extract version from the Version field.
-	// Reject versions with major == 0 — that is the gNMI protocol spec version
-	// (e.g. "0.10.0"), not the IOS-XR software version (always >= 6.x).
-	if caps.Version != "" {
-		if v := extractVersionString(caps.Version); v != "" {
-			major := strings.SplitN(v, ".", 2)[0]
-			if major != "0" {
-				tflog.Info(ctx, fmt.Sprintf("Found version in gNMI capabilities Version field: %s", v))
-				return v, nil
-			}
-			tflog.Debug(ctx, fmt.Sprintf("Ignoring gNMI protocol version '%s' from capabilities Version field", v))
-		}
-	}
-
-	return "", fmt.Errorf("no version information found in capabilities")
-}
+// detectFromCapabilities tries to extract version from gNMI Capabilities response.
+// Commented out: IOS-XR returns the gNMI library version in caps.Version, not the
+// OS version. Uncomment if a future release populates it correctly.
+//
+// func detectFromCapabilities(ctx context.Context, client *gnmi.Client) (string, error) {
+// 	tflog.Debug(ctx, "Trying to detect version from gNMI Capabilities")
+//
+// 	caps, err := client.Capabilities(ctx)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to get capabilities: %w", err)
+// 	}
+//
+// 	// Reject major == 0 — that is the gNMI protocol spec version (e.g. "0.10.0"),
+// 	// not the IOS-XR software version (always >= 6.x).
+// 	if caps.Version != "" {
+// 		if v := extractVersionString(caps.Version); v != "" {
+// 			major := strings.SplitN(v, ".", 2)[0]
+// 			if major != "0" {
+// 				tflog.Info(ctx, fmt.Sprintf("Found version in gNMI capabilities Version field: %s", v))
+// 				return v, nil
+// 			}
+// 			tflog.Debug(ctx, fmt.Sprintf("Ignoring gNMI protocol version '%s' from capabilities Version field", v))
+// 		}
+// 	}
+//
+// 	return "", fmt.Errorf("no version information found in capabilities")
+// }
 
 // extractVersionFromResponse attempts to extract version information from gNMI response
 // Handles Cisco IOS-XR CLI config which contains version in the header

@@ -90,7 +90,8 @@ attributes:
     type: String
     example: NOMATCH3
   - yang_name: console/facility/all
-    tf_name: facility_all
+    tf_name: console_facility
+    replaces_yang_name: console-logging/console-log-facility/console-facility-level
     description: "All supported facilities"
     type: String
     enum_values:
@@ -187,14 +188,14 @@ attributes:
         # exclude_test: true
         example: true
       - yang_name: path/local-accounting/send-to-remote
-        tf_name: send_to_remote
+        tf_name: local_accounting_send_to_remote
         replaces_yang_name: local-accounting/send-to-remote
         type: Bool
         type_yang_bool: presence
         # exclude_test: true
         example: true
       - yang_name: path/local-accounting/send-to-remote/facility
-        tf_name: send_to_remote_facility
+        tf_name: local_accounting_send_to_remote_facility_level
         description: "Modify message logging facilities"
         type: String
         # exclude_test: true
@@ -311,8 +312,6 @@ attributes:
   - yang_name: buffered/discriminator/nomatch2
     legacy: true
   - yang_name: buffered/discriminator/nomatch3
-    legacy: true
-  - yang_name: console-logging/console-log-facility/console-facility-level
     legacy: true
   - yang_name: container/all
     legacy: true

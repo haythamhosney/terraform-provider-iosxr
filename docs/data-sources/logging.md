@@ -52,7 +52,7 @@ data "iosxr_logging" "example" {
 - `console_discriminator_nomatch1` (String) Set no-match discriminator 1
 - `console_discriminator_nomatch2` (String) Set no-match discriminator 2
 - `console_discriminator_nomatch3` (String) Set no-match discriminator 3
-- `console_facility` (String) Console message logging facilities
+- `console_facility` (String) All supported facilities
 - `container_all` (Boolean) Enables log collection from all containers
 - `container_fetch_timestamp` (Boolean) Fetch logs with container timestamp for all containers
 - `events_buffer_size` (Number) Set size of the local event buffer
@@ -61,7 +61,6 @@ data "iosxr_logging" "example" {
 - `events_precfg_suppression` (String) Suppress events from a card/VM till its configuration is complete
 - `events_precfg_suppression_timeout` (Number) Timeout (in minutes) for pre-config events suppression (default 15)
 - `events_threshold` (Number) Configure threshold (%) for capacity alarm
-- `facility_all` (String) All supported facilities
 - `facility_level` (String) configure this node
 - `file` (Attributes List) Set file logging (see [below for nested schema](#nestedatt--file))
 - `filter_matches` (Attributes List) Configure match string to filter (see [below for nested schema](#nestedatt--filter_matches))
@@ -102,11 +101,10 @@ Read-Only:
 - `discriminator_nomatch3` (String) Set no-match discriminator 3
 - `file_name` (String) Set file logging
 - `local_accounting` (Boolean) Store only the command accounting logs
-- `local_accounting_send_to_remote_facility_level` (String) configure this node
+- `local_accounting_send_to_remote` (Boolean) Send the command accounting logs to syslog server
+- `local_accounting_send_to_remote_facility_level` (String) Modify message logging facilities
 - `maxfilesize` (Number) Set max file size
 - `path` (String) File path (e.g. /disk0: )
-- `send_to_remote` (Boolean) Send the command accounting logs to syslog server
-- `send_to_remote_facility` (String) Modify message logging facilities
 - `severity` (String) severity
 
 

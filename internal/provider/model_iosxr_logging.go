@@ -99,7 +99,6 @@ type Logging struct {
 	ConsoleDiscriminatorNomatch1   types.String              `tfsdk:"console_discriminator_nomatch1"`
 	ConsoleDiscriminatorNomatch2   types.String              `tfsdk:"console_discriminator_nomatch2"`
 	ConsoleDiscriminatorNomatch3   types.String              `tfsdk:"console_discriminator_nomatch3"`
-	FacilityAll                    types.String              `tfsdk:"facility_all"`
 }
 
 type LoggingData struct {
@@ -165,7 +164,6 @@ type LoggingData struct {
 	ConsoleDiscriminatorNomatch1   types.String              `tfsdk:"console_discriminator_nomatch1"`
 	ConsoleDiscriminatorNomatch2   types.String              `tfsdk:"console_discriminator_nomatch2"`
 	ConsoleDiscriminatorNomatch3   types.String              `tfsdk:"console_discriminator_nomatch3"`
-	FacilityAll                    types.String              `tfsdk:"facility_all"`
 }
 type LoggingFile struct {
 	FileName                                 types.String `tfsdk:"file_name"`
@@ -173,7 +171,7 @@ type LoggingFile struct {
 	Maxfilesize                              types.Int64  `tfsdk:"maxfilesize"`
 	Severity                                 types.String `tfsdk:"severity"`
 	LocalAccounting                          types.Bool   `tfsdk:"local_accounting"`
-	SendToRemote                             types.Bool   `tfsdk:"send_to_remote"`
+	LocalAccountingSendToRemote              types.Bool   `tfsdk:"local_accounting_send_to_remote"`
 	LocalAccountingSendToRemoteFacilityLevel types.String `tfsdk:"local_accounting_send_to_remote_facility_level"`
 	DiscriminatorMatch1                      types.String `tfsdk:"discriminator_match1"`
 	DiscriminatorMatch2                      types.String `tfsdk:"discriminator_match2"`
@@ -181,7 +179,6 @@ type LoggingFile struct {
 	DiscriminatorNomatch1                    types.String `tfsdk:"discriminator_nomatch1"`
 	DiscriminatorNomatch2                    types.String `tfsdk:"discriminator_nomatch2"`
 	DiscriminatorNomatch3                    types.String `tfsdk:"discriminator_nomatch3"`
-	SendToRemoteFacility                     types.String `tfsdk:"send_to_remote_facility"`
 }
 type LoggingSourceInterfaces struct {
 	Name          types.String                  `tfsdk:"name"`
@@ -238,10 +235,8 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 	if !data.Monitor.IsNull() && !data.Monitor.IsUnknown() {
 		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.monitor-level", "monitor", "25.4"), data.Monitor.ValueString())
 	}
-	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.ConsoleFacility.IsNull() && !data.ConsoleFacility.IsUnknown() {
-			body, _ = sjson.Set(body, "console-logging.console-log-facility.console-facility-level", data.ConsoleFacility.ValueString())
-		}
+	if !data.ConsoleFacility.IsNull() && !data.ConsoleFacility.IsUnknown() {
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "console.facility.all", "console-logging.console-log-facility.console-facility-level", "25.4"), data.ConsoleFacility.ValueString())
 	}
 	if !data.MonitorDiscriminatorMatch1.IsNull() && !data.MonitorDiscriminatorMatch1.IsUnknown() {
 		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4"), data.MonitorDiscriminatorMatch1.ValueString())
@@ -487,11 +482,6 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 			body, _ = sjson.Set(body, "console.discriminator.nomatch3", data.ConsoleDiscriminatorNomatch3.ValueString())
 		}
 	}
-	if helpers.VersionAtLeast(providerVersion, "25.4") {
-		if !data.FacilityAll.IsNull() && !data.FacilityAll.IsUnknown() {
-			body, _ = sjson.Set(body, "console.facility.all", data.FacilityAll.ValueString())
-		}
-	}
 	if len(data.File) > 0 {
 		body, _ = sjson.Set(body, "files.file", []interface{}{})
 		for index, item := range data.File {
@@ -512,14 +502,14 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.local-accounting", "local-accounting", "25.4"), map[string]string{})
 				}
 			}
-			if !item.SendToRemote.IsNull() && !item.SendToRemote.IsUnknown() {
-				if item.SendToRemote.ValueBool() {
+			if !item.LocalAccountingSendToRemote.IsNull() && !item.LocalAccountingSendToRemote.IsUnknown() {
+				if item.LocalAccountingSendToRemote.ValueBool() {
 					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4"), map[string]string{})
 				}
 			}
 			if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
 				if !item.LocalAccountingSendToRemoteFacilityLevel.IsNull() && !item.LocalAccountingSendToRemoteFacilityLevel.IsUnknown() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"local-accounting.send-to-remote.facility.level", item.LocalAccountingSendToRemoteFacilityLevel.ValueString())
+					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path.local-accounting.send-to-remote.facility", item.LocalAccountingSendToRemoteFacilityLevel.ValueString())
 				}
 			}
 			if !item.DiscriminatorMatch1.IsNull() && !item.DiscriminatorMatch1.IsUnknown() {
@@ -539,11 +529,6 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 			}
 			if !item.DiscriminatorNomatch3.IsNull() && !item.DiscriminatorNomatch3.IsUnknown() {
 				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"discriminator.nomatch3", item.DiscriminatorNomatch3.ValueString())
-			}
-			if helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.SendToRemoteFacility.IsNull() && !item.SendToRemoteFacility.IsUnknown() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path.local-accounting.send-to-remote.facility", item.SendToRemoteFacility.ValueString())
-				}
 			}
 		}
 	}
@@ -635,11 +620,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 	constraints := make([]helpers.FieldVersionConstraint, 0)
 
 	constraints = append(constraints, []helpers.FieldVersionConstraint{
-		{
-			FieldPath: "console_facility",
-
-			RemovedInVersion: "25.4",
-		},
 		{
 			FieldPath: "archive_disk0",
 
@@ -761,10 +741,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 			RemovedInVersion: "25.4",
 		},
 		{
-			FieldPath:      "file.send_to_remote_facility",
-			AddedInVersion: "25.4",
-		},
-		{
 			FieldPath: "source_interfaces.name",
 
 			RemovedInVersion: "25.4",
@@ -826,10 +802,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 			FieldPath:      "console_discriminator_nomatch3",
 			AddedInVersion: "25.4",
 		},
-		{
-			FieldPath:      "facility_all",
-			AddedInVersion: "25.4",
-		},
 	}...)
 	if len(constraints) == 0 {
 		return nil
@@ -866,6 +838,13 @@ func (data Logging) GetEnumConstraints() []helpers.FieldEnumConstraint {
 			VersionEnums: map[string][]string{
 				"24.4": {"alerts", "critical", "debugging", "emergencies", "error", "info", "notifications", "warning"},
 				"25.4": {"alerts", "critical", "debugging", "disable", "emergencies", "errors", "informational", "notifications", "warning"},
+			},
+		},
+		{
+			FieldPath: "file.local_accounting_send_to_remote_facility_level",
+			VersionEnums: map[string][]string{
+				"24.4": {"auth", "cron", "daemon", "kern", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7", "lpr", "mail", "news", "sys10", "sys11", "sys12", "sys13", "sys14", "sys9", "syslog", "user", "uucp"},
+				"25.4": {"auth", "cron", "daemon", "kern", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7", "lpr", "mail", "news", "syslog", "user", "uucp"},
 			},
 		},
 	}
@@ -911,7 +890,7 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 	} else {
 		data.Monitor = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "console-logging.console-log-facility.console-facility-level"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.ConsoleFacility.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.facility.all", "console-logging.console-log-facility.console-facility-level", "25.4")); value.Exists() && value.Type == gjson.String && !data.ConsoleFacility.IsNull() {
 		data.ConsoleFacility = types.StringValue(value.String())
 	} else {
 		data.ConsoleFacility = types.StringNull()
@@ -1156,16 +1135,16 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 		} else {
 			data.File[i].LocalAccounting = types.BoolNull()
 		}
-		if value := r.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); !data.File[i].SendToRemote.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); !data.File[i].LocalAccountingSendToRemote.IsNull() {
 			if value.Exists() {
-				data.File[i].SendToRemote = types.BoolValue(true)
+				data.File[i].LocalAccountingSendToRemote = types.BoolValue(true)
 			} else {
-				data.File[i].SendToRemote = types.BoolValue(false)
+				data.File[i].LocalAccountingSendToRemote = types.BoolValue(false)
 			}
 		} else {
-			data.File[i].SendToRemote = types.BoolNull()
+			data.File[i].LocalAccountingSendToRemote = types.BoolNull()
 		}
-		if value := r.Get("local-accounting.send-to-remote.facility.level"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
+		if value := r.Get("path.local-accounting.send-to-remote.facility"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
 			data.File[i].LocalAccountingSendToRemoteFacilityLevel = types.StringValue(value.String())
 		} else {
 			data.File[i].LocalAccountingSendToRemoteFacilityLevel = types.StringNull()
@@ -1199,11 +1178,6 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 			data.File[i].DiscriminatorNomatch3 = types.StringValue(value.String())
 		} else {
 			data.File[i].DiscriminatorNomatch3 = types.StringNull()
-		}
-		if value := r.Get("path.local-accounting.send-to-remote.facility"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.File[i].SendToRemoteFacility.IsNull() {
-			data.File[i].SendToRemoteFacility = types.StringValue(value.String())
-		} else {
-			data.File[i].SendToRemoteFacility = types.StringNull()
 		}
 	}
 	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.level", "history", "25.4")); value.Exists() && value.Type == gjson.String && !data.History.IsNull() {
@@ -1546,11 +1520,6 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 	} else {
 		data.ConsoleDiscriminatorNomatch3 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, "console.facility.all"); helpers.VersionAtLeast(version, "25.4") && value.Exists() && value.Type == gjson.String && !data.FacilityAll.IsNull() {
-		data.FacilityAll = types.StringValue(value.String())
-	} else {
-		data.FacilityAll = types.StringNull()
-	}
 }
 
 // End of section. //template:end updateFromBody
@@ -1567,12 +1536,8 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.monitor-level", "monitor", "25.4")); value.Exists() && value.Type == gjson.String {
 		data.Monitor = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "console-logging.console-log-facility.console-facility-level"); value.Exists() && value.Type == gjson.String {
-			data.ConsoleFacility = types.StringValue(value.String())
-		}
-	} else {
-		data.ConsoleFacility = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.facility.all", "console-logging.console-log-facility.console-facility-level", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.ConsoleFacility = types.StringValue(value.String())
 	}
 	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
@@ -1798,12 +1763,12 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 				item.LocalAccounting = types.BoolValue(false)
 			}
 			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); cValue.Exists() {
-				item.SendToRemote = types.BoolValue(true)
+				item.LocalAccountingSendToRemote = types.BoolValue(true)
 			} else {
-				item.SendToRemote = types.BoolValue(false)
+				item.LocalAccountingSendToRemote = types.BoolValue(false)
 			}
 			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("local-accounting.send-to-remote.facility.level"); cValue.Exists() && cValue.Type == gjson.String {
+				if cValue := v.Get("path.local-accounting.send-to-remote.facility"); cValue.Exists() && cValue.Type == gjson.String {
 					item.LocalAccountingSendToRemoteFacilityLevel = types.StringValue(cValue.String())
 				}
 			} else {
@@ -1826,13 +1791,6 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 			}
 			if cValue := v.Get("discriminator.nomatch3"); cValue.Exists() && cValue.Type == gjson.String {
 				item.DiscriminatorNomatch3 = types.StringValue(cValue.String())
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.local-accounting.send-to-remote.facility"); cValue.Exists() && cValue.Type == gjson.String {
-					item.SendToRemoteFacility = types.StringValue(cValue.String())
-				}
-			} else {
-				item.SendToRemoteFacility = types.StringNull()
 			}
 			data.File = append(data.File, item)
 			return true
@@ -2045,13 +2003,6 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 		}
 	} else {
 		data.ConsoleDiscriminatorNomatch3 = types.StringNull()
-	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "console.facility.all"); value.Exists() && value.Type == gjson.String {
-			data.FacilityAll = types.StringValue(value.String())
-		}
-	} else {
-		data.FacilityAll = types.StringNull()
 	}
 }
 
@@ -2069,12 +2020,8 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.monitor-level", "monitor", "25.4")); value.Exists() && value.Type == gjson.String {
 		data.Monitor = types.StringValue(value.String())
 	}
-	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "console-logging.console-log-facility.console-facility-level"); value.Exists() && value.Type == gjson.String {
-			data.ConsoleFacility = types.StringValue(value.String())
-		}
-	} else {
-		data.ConsoleFacility = types.StringNull()
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.facility.all", "console-logging.console-log-facility.console-facility-level", "25.4")); value.Exists() && value.Type == gjson.String {
+		data.ConsoleFacility = types.StringValue(value.String())
 	}
 	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
@@ -2300,12 +2247,12 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 				item.LocalAccounting = types.BoolValue(false)
 			}
 			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); cValue.Exists() {
-				item.SendToRemote = types.BoolValue(true)
+				item.LocalAccountingSendToRemote = types.BoolValue(true)
 			} else {
-				item.SendToRemote = types.BoolValue(false)
+				item.LocalAccountingSendToRemote = types.BoolValue(false)
 			}
 			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("local-accounting.send-to-remote.facility.level"); cValue.Exists() && cValue.Type == gjson.String {
+				if cValue := v.Get("path.local-accounting.send-to-remote.facility"); cValue.Exists() && cValue.Type == gjson.String {
 					item.LocalAccountingSendToRemoteFacilityLevel = types.StringValue(cValue.String())
 				}
 			} else {
@@ -2328,13 +2275,6 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 			}
 			if cValue := v.Get("discriminator.nomatch3"); cValue.Exists() && cValue.Type == gjson.String {
 				item.DiscriminatorNomatch3 = types.StringValue(cValue.String())
-			}
-			if helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.local-accounting.send-to-remote.facility"); cValue.Exists() && cValue.Type == gjson.String {
-					item.SendToRemoteFacility = types.StringValue(cValue.String())
-				}
-			} else {
-				item.SendToRemoteFacility = types.StringNull()
 			}
 			data.File = append(data.File, item)
 			return true
@@ -2548,13 +2488,6 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 	} else {
 		data.ConsoleDiscriminatorNomatch3 = types.StringNull()
 	}
-	if helpers.VersionAtLeast(version, "25.4") {
-		if value := gjson.GetBytes(res, "console.facility.all"); value.Exists() && value.Type == gjson.String {
-			data.FacilityAll = types.StringValue(value.String())
-		}
-	} else {
-		data.FacilityAll = types.StringNull()
-	}
 }
 
 // End of section. //template:end fromBodyData
@@ -2563,9 +2496,6 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 
 func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version string) []string {
 	deletedItems := make([]string, 0)
-	if helpers.VersionAtLeast(version, "25.4") && !state.FacilityAll.IsNull() && data.FacilityAll.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/console/facility/all", state.getPath()))
-	}
 	if helpers.VersionAtLeast(version, "25.4") && !state.ConsoleDiscriminatorNomatch3.IsNull() && data.ConsoleDiscriminatorNomatch3.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/console/discriminator/nomatch3", state.getPath()))
 	}
@@ -2873,9 +2803,6 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 				found = false
 			}
 			if found {
-				if helpers.VersionAtLeast(version, "25.4") && !state.File[i].SendToRemoteFacility.IsNull() && data.File[j].SendToRemoteFacility.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote/facility", state.getPath(), keyString))
-				}
 				if !state.File[i].DiscriminatorNomatch3.IsNull() && data.File[j].DiscriminatorNomatch3.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/discriminator/nomatch3", state.getPath(), keyString))
 				}
@@ -2895,9 +2822,9 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/discriminator/match1", state.getPath(), keyString))
 				}
 				if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() && data.File[j].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
-					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/local-accounting/send-to-remote/facility/level", state.getPath(), keyString))
+					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote/facility", state.getPath(), keyString))
 				}
-				if !state.File[i].SendToRemote.IsNull() && data.File[j].SendToRemote.IsNull() {
+				if !state.File[i].LocalAccountingSendToRemote.IsNull() && data.File[j].LocalAccountingSendToRemote.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote", state.getPath(), keyString))
 				}
 				if !state.File[i].LocalAccounting.IsNull() && data.File[j].LocalAccounting.IsNull() {
@@ -3015,8 +2942,8 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 	if !state.MonitorDiscriminatorMatch1.IsNull() && data.MonitorDiscriminatorMatch1.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/discriminator/match1", state.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.ConsoleFacility.IsNull() && data.ConsoleFacility.IsNull() {
-		deletedItems = append(deletedItems, fmt.Sprintf("%v/console-logging/console-log-facility/console-facility-level", state.getPath()))
+	if !state.ConsoleFacility.IsNull() && data.ConsoleFacility.IsNull() {
+		deletedItems = append(deletedItems, fmt.Sprintf("%v/console/facility/all", state.getPath()))
 	}
 	if !state.Monitor.IsNull() && data.Monitor.IsNull() {
 		deletedItems = append(deletedItems, fmt.Sprintf("%v/monitor/monitor-level", state.getPath()))
@@ -3123,7 +3050,7 @@ func (data *Logging) getEmptyLeafsDelete(ctx context.Context, version string) []
 		for ki := range keys {
 			keyString += "[" + keys[ki] + "=" + keyValues[ki] + "]"
 		}
-		if !data.File[i].SendToRemote.IsNull() && !data.File[i].SendToRemote.ValueBool() {
+		if !data.File[i].LocalAccountingSendToRemote.IsNull() && !data.File[i].LocalAccountingSendToRemote.ValueBool() {
 			emptyLeafsDelete = append(emptyLeafsDelete, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote", data.getPath(), keyString))
 		}
 		if !data.File[i].LocalAccounting.IsNull() && !data.File[i].LocalAccounting.ValueBool() {
@@ -3159,9 +3086,6 @@ func (data *Logging) getEmptyLeafsDelete(ctx context.Context, version string) []
 // Section below is generated&owned by "gen/generator.go". //template:begin getDeletePaths
 func (data *Logging) getDeletePaths(ctx context.Context, version string) []string {
 	var deletePaths []string
-	if helpers.VersionAtLeast(version, "25.4") && !data.FacilityAll.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/console/facility/all", data.getPath()))
-	}
 	if helpers.VersionAtLeast(version, "25.4") && !data.ConsoleDiscriminatorNomatch3.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/console/discriminator/nomatch3", data.getPath()))
 	}
@@ -3408,8 +3332,8 @@ func (data *Logging) getDeletePaths(ctx context.Context, version string) []strin
 	if !data.MonitorDiscriminatorMatch1.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/discriminator/match1", data.getPath()))
 	}
-	if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !data.ConsoleFacility.IsNull() {
-		deletePaths = append(deletePaths, fmt.Sprintf("%v/console-logging/console-log-facility/console-facility-level", data.getPath()))
+	if !data.ConsoleFacility.IsNull() {
+		deletePaths = append(deletePaths, fmt.Sprintf("%v/console/facility/all", data.getPath()))
 	}
 	if !data.Monitor.IsNull() {
 		deletePaths = append(deletePaths, fmt.Sprintf("%v/monitor/monitor-level", data.getPath()))

@@ -32,7 +32,6 @@ This resource can manage the Logging configuration.
 | `buffered_discriminator_nomatch1` | `25.4` |
 | `buffered_discriminator_nomatch2` | `25.4` |
 | `buffered_discriminator_nomatch3` | `25.4` |
-| `console_facility` | `25.4` |
 | `container_all` | `25.4` |
 | `container_fetch_timestamp` | `25.4` |
 | `facility_level` | `25.4` |
@@ -84,15 +83,14 @@ resource "iosxr_logging" "example" {
       maxfilesize                                    = 1024
       severity                                       = "informational"
       local_accounting                               = true
-      send_to_remote                                 = true
-      local_accounting_send_to_remote_facility_level = "local0"
+      local_accounting_send_to_remote                = true
+      local_accounting_send_to_remote_facility_level = "auth"
       discriminator_match1                           = "MATCH1"
       discriminator_match2                           = "MATCH2"
       discriminator_match3                           = "MATCH3"
       discriminator_nomatch1                         = "NOMATCH1"
       discriminator_nomatch2                         = "NOMATCH2"
       discriminator_nomatch3                         = "NOMATCH3"
-      send_to_remote_facility                        = "auth"
     }
   ]
   history        = "alerts"
@@ -142,7 +140,6 @@ resource "iosxr_logging" "example" {
   console_discriminator_nomatch1 = "NOMATCH1"
   console_discriminator_nomatch2 = "NOMATCH2"
   console_discriminator_nomatch3 = "NOMATCH3"
-  facility_all                   = "all"
 }
 ```
 
@@ -208,9 +205,8 @@ resource "iosxr_logging" "example" {
   - Supported from version: `25.4`
 - `console_discriminator_nomatch3` (String) Set no-match discriminator 3
   - Supported from version: `25.4`
-- `console_facility` (String) Console message logging facilities
+- `console_facility` (String) All supported facilities
   - Choices: `all`
-  - **Not supported from version `25.4` and above**
 - `container_all` (Boolean) Enables log collection from all containers
   - **Not supported from version `25.4` and above**
 - `container_fetch_timestamp` (Boolean) Fetch logs with container timestamp for all containers
@@ -229,9 +225,6 @@ resource "iosxr_logging" "example" {
   - Range: `1`-`60`
 - `events_threshold` (Number) Configure threshold (%) for capacity alarm
   - Range: `10`-`100`
-- `facility_all` (String) All supported facilities
-  - Choices: `all`
-  - Supported from version: `25.4`
 - `facility_level` (String) configure this node
   - Choices: `all`, `audit`, `auth`, `authpriv`, `console`, `daemon`, `kern`, `local0`, `local1`, `local2`, `local3`, `local4`, `local5`, `local6`, `local7`, `mail`, `ntp`, `syslog`, `user`
   - **Not supported from version `25.4` and above**
@@ -300,13 +293,11 @@ Optional:
 - `discriminator_nomatch2` (String) Set no-match discriminator 2
 - `discriminator_nomatch3` (String) Set no-match discriminator 3
 - `local_accounting` (Boolean) Store only the command accounting logs
-- `local_accounting_send_to_remote_facility_level` (String) configure this node
+- `local_accounting_send_to_remote` (Boolean) Send the command accounting logs to syslog server
+- `local_accounting_send_to_remote_facility_level` (String) Modify message logging facilities
   - Choices: `auth`, `cron`, `daemon`, `kern`, `local0`, `local1`, `local2`, `local3`, `local4`, `local5`, `local6`, `local7`, `lpr`, `mail`, `news`, `sys10`, `sys11`, `sys12`, `sys13`, `sys14`, `sys9`, `syslog`, `user`, `uucp`
+  - Choices: `auth`, `cron`, `daemon`, `kern`, `local0`, `local1`, `local2`, `local3`, `local4`, `local5`, `local6`, `local7`, `lpr`, `mail`, `news`, `sys10`, `sys11`, `sys12`, `sys13`, `sys14`, `sys9`, `syslog`, `user`, `uucp` (v24.4), `auth`, `cron`, `daemon`, `kern`, `local0`, `local1`, `local2`, `local3`, `local4`, `local5`, `local6`, `local7`, `lpr`, `mail`, `news`, `syslog`, `user`, `uucp` (v25.4)
   - **Not supported from version `25.4` and above**
-- `send_to_remote` (Boolean) Send the command accounting logs to syslog server
-- `send_to_remote_facility` (String) Modify message logging facilities
-  - Choices: `auth`, `cron`, `daemon`, `kern`, `local0`, `local1`, `local2`, `local3`, `local4`, `local5`, `local6`, `local7`, `lpr`, `mail`, `news`, `syslog`, `user`, `uucp`
-  - Supported from version: `25.4`
 
 
 <a id="nestedatt--filter_matches"></a>

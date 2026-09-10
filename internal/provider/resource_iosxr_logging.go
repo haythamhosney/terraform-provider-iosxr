@@ -101,7 +101,7 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 			},
 			"console_facility": schema.StringAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("Console message logging facilities").AddStringEnumDescription("all").String + "\n  - **Not supported from version `25.4` and above**",
+				MarkdownDescription: helpers.NewAttributeDescription("All supported facilities").AddStringEnumDescription("all").String,
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf("all"),
@@ -346,12 +346,12 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 							MarkdownDescription: helpers.NewAttributeDescription("Store only the command accounting logs").String,
 							Optional:            true,
 						},
-						"send_to_remote": schema.BoolAttribute{
+						"local_accounting_send_to_remote": schema.BoolAttribute{
 							MarkdownDescription: helpers.NewAttributeDescription("Send the command accounting logs to syslog server").String,
 							Optional:            true,
 						},
 						"local_accounting_send_to_remote_facility_level": schema.StringAttribute{
-							MarkdownDescription: helpers.NewAttributeDescription("configure this node").AddStringEnumDescription("auth", "cron", "daemon", "kern", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7", "lpr", "mail", "news", "sys10", "sys11", "sys12", "sys13", "sys14", "sys9", "syslog", "user", "uucp").String + "\n  - **Not supported from version `25.4` and above**",
+							MarkdownDescription: helpers.NewAttributeDescription("Modify message logging facilities").AddStringEnumDescription("auth", "cron", "daemon", "kern", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7", "lpr", "mail", "news", "sys10", "sys11", "sys12", "sys13", "sys14", "sys9", "syslog", "user", "uucp").String + "\n  - Choices: `auth`, `cron`, `daemon`, `kern`, `local0`, `local1`, `local2`, `local3`, `local4`, `local5`, `local6`, `local7`, `lpr`, `mail`, `news`, `sys10`, `sys11`, `sys12`, `sys13`, `sys14`, `sys9`, `syslog`, `user`, `uucp` (v24.4), `auth`, `cron`, `daemon`, `kern`, `local0`, `local1`, `local2`, `local3`, `local4`, `local5`, `local6`, `local7`, `lpr`, `mail`, `news`, `syslog`, `user`, `uucp` (v25.4)" + "\n  - **Not supported from version `25.4` and above**",
 							Optional:            true,
 							Validators: []validator.String{
 								stringvalidator.OneOf("auth", "cron", "daemon", "kern", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7", "lpr", "mail", "news", "sys10", "sys11", "sys12", "sys13", "sys14", "sys9", "syslog", "user", "uucp"),
@@ -403,13 +403,6 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 							Validators: []validator.String{
 								stringvalidator.LengthBetween(1, 32),
 								stringvalidator.RegexMatches(regexp.MustCompile(`[\w\-\.:,_@#%$\+=\| ;]+`), ""),
-							},
-						},
-						"send_to_remote_facility": schema.StringAttribute{
-							MarkdownDescription: helpers.NewAttributeDescription("Modify message logging facilities").AddStringEnumDescription("auth", "cron", "daemon", "kern", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7", "lpr", "mail", "news", "syslog", "user", "uucp").String + "\n  - Supported from version: `25.4`",
-							Optional:            true,
-							Validators: []validator.String{
-								stringvalidator.OneOf("auth", "cron", "daemon", "kern", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7", "lpr", "mail", "news", "syslog", "user", "uucp"),
 							},
 						},
 					},
@@ -651,13 +644,6 @@ func (r *LoggingResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(1, 32),
-				},
-			},
-			"facility_all": schema.StringAttribute{
-				MarkdownDescription: helpers.NewAttributeDescription("All supported facilities").AddStringEnumDescription("all").String + "\n  - Supported from version: `25.4`",
-				Optional:            true,
-				Validators: []validator.String{
-					stringvalidator.OneOf("all"),
 				},
 			},
 		},

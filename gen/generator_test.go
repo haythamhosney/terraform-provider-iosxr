@@ -230,8 +230,14 @@ func TestMergeAttributes_ExistingAttrFieldsUpdated(t *testing.T) {
 	if got[0].Description != "new desc" {
 		t.Errorf("Description: got %q, want %q", got[0].Description, "new desc")
 	}
-	if got[0].DefaultValue != "informational" {
-		t.Errorf("DefaultValue: got %q, want %q", got[0].DefaultValue, "informational")
+	// DefaultValue introduced in an override becomes a versioned default (F17 VersionDefaults).
+	// The base had no default (""), so this is a version-scoped change: stored in VersionDefaults,
+	// DefaultValue is cleared to "".
+	if got[0].DefaultValue != "" {
+		t.Errorf("DefaultValue: got %q, want empty (versioned default stored in VersionDefaults)", got[0].DefaultValue)
+	}
+	if got[0].VersionDefaults["25.4"] != "informational" {
+		t.Errorf("VersionDefaults[25.4]: got %q, want %q", got[0].VersionDefaults["25.4"], "informational")
 	}
 	// Version not stamped on existing attrs
 	if got[0].AddedInVersion != "" {
@@ -335,6 +341,61 @@ func TestMergeAttributes_CompositeKeyVersionedKeys(t *testing.T) {
 	}
 	if got[2].AddedInVersion != "25.4" {
 		t.Errorf("vrf-name AddedInVersion: got %q, want %q", got[2].AddedInVersion, "25.4")
+	}
+}
+
+func TestMergeAttributes_ReplacesYangName_OnKeyAttr(t *testing.T) {
+	// Verifies that replaces_yang_name on an id:true attribute is fully processed:
+	// Phase 1 (mergeAttributes): VersionYangNames populated with "_base" placeholder.
+	// Phase 2 (fixAttributeBaseVersion): "_base" replaced with real base version,
+	// MovedInVersion derived.
+	base := []YamlConfigAttribute{
+		{YangName: "name", TfName: "name", Type: "String", Id: true},
+	}
+	override := []YamlConfigAttribute{
+		{YangName: "host", TfName: "name", Type: "String", Id: true, ReplacesYangName: "name"},
+	}
+
+	// Phase 1
+	got := mergeAttributes(base, override, "25.4")
+	if len(got) != 1 {
+		t.Fatalf("len: got %d, want 1", len(got))
+	}
+	if got[0].YangName != "host" {
+		t.Errorf("YangName: got %q, want %q", got[0].YangName, "host")
+	}
+	if !got[0].Id {
+		t.Error("Id: got false, want true")
+	}
+	if got[0].TfName != "name" {
+		t.Errorf("TfName: got %q, want %q", got[0].TfName, "name")
+	}
+	if got[0].AddedInVersion != "" {
+		t.Errorf("AddedInVersion: got %q, want empty (not treated as new attr)", got[0].AddedInVersion)
+	}
+	if got[0].RemovedInVersion != "" {
+		t.Errorf("RemovedInVersion: got %q, want empty", got[0].RemovedInVersion)
+	}
+	if got[0].VersionYangNames["_base"] != "name" {
+		t.Errorf("VersionYangNames[_base]: got %q, want %q", got[0].VersionYangNames["_base"], "name")
+	}
+	if got[0].VersionYangNames["25.4"] != "host" {
+		t.Errorf("VersionYangNames[25.4]: got %q, want %q", got[0].VersionYangNames["25.4"], "host")
+	}
+	if got[0].MovedInVersion != "" {
+		t.Errorf("MovedInVersion: got %q, want empty (not set until fixAttributeBaseVersion)", got[0].MovedInVersion)
+	}
+
+	// Phase 2
+	fixAttributeBaseVersion(&got[0], "24.4")
+	if got[0].VersionYangNames["24.4"] != "name" {
+		t.Errorf("VersionYangNames[24.4]: got %q, want %q", got[0].VersionYangNames["24.4"], "name")
+	}
+	if _, hasBase := got[0].VersionYangNames["_base"]; hasBase {
+		t.Error("VersionYangNames[_base]: still present after fixAttributeBaseVersion, want removed")
+	}
+	if got[0].MovedInVersion != "25.4" {
+		t.Errorf("MovedInVersion: got %q, want %q", got[0].MovedInVersion, "25.4")
 	}
 }
 

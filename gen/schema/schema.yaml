@@ -20,6 +20,7 @@ attribute:
   yang_name: str(required=False)  # YANG name/path of the attribute
   yang_scope: str(required=False)  # When trying to find a matching element in the YANG model, limit the scope by proving the parent element name here
   tf_name: str(required=False)  # Optionally provide a Terraform name for the attribute, otherwise it will be derived from the YANG name
+  replaces_yang_name: str(required=False)  # YANG name/path this attribute replaced in a prior version; enables version-conditional path selection at runtime
   xpath: str(required=False)  # Optionally provide an XPath for the attribute, otherwise it will be derived from 'yang_name'
   type: enum('String', 'Int64', 'Bool', 'List', 'Set', 'StringList', 'Int64List', 'StringSet', 'Int64Set', required=False)  # Terraform type of the attribute
   read_raw: bool(required=False)  # Set to true if the attribute value should be read as raw JSON without processing

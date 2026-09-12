@@ -693,7 +693,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) updateFromBody(ctx context.Co
 		{{- end}}
 		{{- end}}{{end}}
 		{{- else}}
-		keys := [...]string{ {{range .Attributes}}{{if .Id}}"{{.YangName}}", {{end}}{{end}} }
+		keys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 		keyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(data.{{$list}}[i].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(data.{{$list}}[i].{{toGoName .TfName}}.ValueBool()), {{else}}data.{{$list}}[i].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 		{{- end}}
 
@@ -796,7 +796,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) updateFromBody(ctx context.Co
 			{{- end}}
 			{{- end}}{{end}}
 			{{- else}}
-			keys := [...]string{ {{range .Attributes}}{{if .Id}}"{{.YangName}}", {{end}}{{end}} }
+			keys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 			keyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(data.{{$list}}[i].{{$clist}}[ci].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(data.{{$list}}[i].{{$clist}}[ci].{{toGoName .TfName}}.ValueBool()), {{else}}data.{{$list}}[i].{{$clist}}[ci].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 			{{- end}}
 
@@ -899,7 +899,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) updateFromBody(ctx context.Co
 				{{- end}}
 				{{- end}}{{end}}
 				{{- else}}
-				keys := [...]string{ {{range .Attributes}}{{if .Id}}"{{.YangName}}", {{end}}{{end}} }
+				keys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 				keyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{toGoName .TfName}}.ValueBool()), {{else}}data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 				{{- end}}
 
@@ -1002,7 +1002,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) updateFromBody(ctx context.Co
 					{{- end}}
 					{{- end}}{{end}}
 					{{- else}}
-					keys := [...]string{ {{range .Attributes}}{{if .Id}}"{{.YangName}}", {{end}}{{end}} }
+					keys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 					keyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{$ccclist}}[ccci].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{$ccclist}}[ccci].{{toGoName .TfName}}.ValueBool()), {{else}}data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{$ccclist}}[ccci].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 					{{- end}}
 
@@ -1920,7 +1920,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) getDeletedItems(ctx context.C
 		{{- end}}
 		{{- end}}{{end}}
 		{{- else}}
-		keys := [...]string{ {{range .Attributes}}{{if .Id}}"{{getDeletePath .}}", {{end}}{{end}} }
+		keys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 		stateKeyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(state.{{$list}}[i].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(state.{{$list}}[i].{{toGoName .TfName}}.ValueBool()), {{else}}state.{{$list}}[i].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 		{{- end}}
 		keyString := ""
@@ -1984,7 +1984,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) getDeletedItems(ctx context.C
 					{{- end}}
 					{{- end}}{{end}}
 					{{- else}}
-					ckeys := [...]string{ {{range .Attributes}}{{if .Id}}"{{getDeletePath .}}", {{end}}{{end}} }
+					ckeys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 					cstateKeyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(state.{{$list}}[i].{{$clist}}[ci].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(state.{{$list}}[i].{{$clist}}[ci].{{toGoName .TfName}}.ValueBool()), {{else}}state.{{$list}}[i].{{$clist}}[ci].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 					{{- end}}
 					ckeyString := ""
@@ -2048,7 +2048,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) getDeletedItems(ctx context.C
 							{{- end}}
 							{{- end}}{{end}}
 							{{- else}}
-							cckeys := [...]string{ {{range .Attributes}}{{if .Id}}"{{getDeletePath .}}", {{end}}{{end}} }
+							cckeys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 							ccstateKeyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(state.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(state.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{toGoName .TfName}}.ValueBool()), {{else}}state.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 							{{- end}}
 							cckeyString := ""
@@ -2112,7 +2112,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) getDeletedItems(ctx context.C
 									{{- end}}
 									{{- end}}{{end}}
 									{{- else}}
-									ccckeys := [...]string{ {{range .Attributes}}{{if .Id}}"{{getDeletePath .}}", {{end}}{{end}} }
+									ccckeys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 									cccstateKeyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(state.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{$ccclist}}[ccci].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(state.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{$ccclist}}[ccci].{{toGoName .TfName}}.ValueBool()), {{else}}state.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{$ccclist}}[ccci].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 									{{- end}}
 									ccckeyString := ""
@@ -2242,7 +2242,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) getEmptyLeafsDelete(ctx conte
 			{{- end}}
 			{{- end}}{{end}}
 			{{- else}}
-			keys := [...]string{ {{range .Attributes}}{{if .Id}}"{{getDeletePath .}}", {{end}}{{end}} }
+			keys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 			keyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(data.{{$list}}[i].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(data.{{$list}}[i].{{toGoName .TfName}}.ValueBool()), {{else}}data.{{$list}}[i].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 			{{- end}}
 		keyString := ""
@@ -2283,7 +2283,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) getEmptyLeafsDelete(ctx conte
 				{{- end}}
 				{{- end}}{{end}}
 				{{- else}}
-				ckeys := [...]string{ {{range .Attributes}}{{if .Id}}"{{getDeletePath .}}", {{end}}{{end}} }
+				ckeys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 				ckeyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(data.{{$list}}[i].{{$clist}}[ci].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(data.{{$list}}[i].{{$clist}}[ci].{{toGoName .TfName}}.ValueBool()), {{else}}data.{{$list}}[i].{{$clist}}[ci].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 				{{- end}}
 			ckeyString := ""
@@ -2324,7 +2324,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) getEmptyLeafsDelete(ctx conte
 					{{- end}}
 					{{- end}}{{end}}
 					{{- else}}
-					cckeys := [...]string{ {{range .Attributes}}{{if .Id}}"{{getDeletePath .}}", {{end}}{{end}} }
+					cckeys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 					cckeyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{toGoName .TfName}}.ValueBool()), {{else}}data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 					{{- end}}
 				cckeyString := ""
@@ -2365,7 +2365,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) getEmptyLeafsDelete(ctx conte
 						{{- end}}
 						{{- end}}{{end}}
 						{{- else}}
-						ccckeys := [...]string{ {{range .Attributes}}{{if .Id}}"{{getDeletePath .}}", {{end}}{{end}} }
+						ccckeys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 						ccckeyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{$ccclist}}[ccci].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{$ccclist}}[ccci].{{toGoName .TfName}}.ValueBool()), {{else}}data.{{$list}}[i].{{$clist}}[ci].{{$cclist}}[cci].{{$ccclist}}[ccci].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 						{{- end}}
 				ccckeyString := ""
@@ -2445,7 +2445,7 @@ func (data *{{camelCase .Name}}{{$versionSuffix}}) getDeletePaths(ctx context.Co
 		{{- end}}
 		{{- end}}{{end}}
 		{{- else}}
-		keys := [...]string{ {{range .Attributes}}{{if .Id}}"{{getDeletePath .}}", {{end}}{{end}} }
+		keys := [...]string{ {{range .Attributes}}{{if .Id}}{{keyPathExpr . "version"}}, {{end}}{{end}} }
 		keyValues := [...]string{ {{range .Attributes}}{{if .Id}}{{if eq .Type "Int64"}}strconv.FormatInt(data.{{$list}}[i].{{toGoName .TfName}}.ValueInt64(), 10), {{else if eq .Type "Bool"}}strconv.FormatBool(data.{{$list}}[i].{{toGoName .TfName}}.ValueBool()), {{else}}data.{{$list}}[i].{{toGoName .TfName}}.Value{{.Type}}(), {{end}}{{end}}{{end}} }
 		{{- end}}
 

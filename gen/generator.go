@@ -275,6 +275,19 @@ func JsonPathExpr(attr YamlConfigAttribute, versionVar string) string {
 		versionVar, path, old, attr.MovedInVersion)
 }
 
+// KeyPathExpr returns a Go expression string for a list key's YANG path,
+// version-conditional when the key has moved (replaces_yang_name set on an id:true attr).
+// Uses XPath form (slash-separated, gNMI predicate-compatible) not dot-notation.
+func KeyPathExpr(attr YamlConfigAttribute, versionVar string) string {
+	path := GetXPath(attr.YangName, attr.XPath)
+	if len(attr.VersionYangNames) == 0 {
+		return fmt.Sprintf("%q", path)
+	}
+	old := GetXPath(attr.ReplacesYangName, attr.ReplacesXPath)
+	return fmt.Sprintf(`helpers.SelectYangPath(%s, %q, %q, %q)`,
+		versionVar, path, old, attr.MovedInVersion)
+}
+
 // Templating helper function to convert string to camel case
 func CamelCase(s string) string {
 	var g []string
@@ -911,6 +924,7 @@ var functions = template.FuncMap{
 	"toGoName":                       ToGoName,
 	"toJsonPath":                     ToJsonPath,
 	"jsonPathExpr":                   JsonPathExpr,
+	"keyPathExpr":                    KeyPathExpr,
 	"camelCase":                      CamelCase,
 	"snakeCase":                      SnakeCase,
 	"versionSuffix":                  VersionSuffix,
@@ -1549,8 +1563,11 @@ func mergeAttributes(base, override []YamlConfigAttribute, overrideVersion strin
 				}
 
 				if newAttr.ReplacesYangName != "" {
-					if result[i].Id {
-						log.Fatalf("replaces_yang_name on attribute %q: key attributes (id: true) are not supported", newAttr.TfName)
+					if result[i].Reference {
+						log.Printf("WARNING: replaces_yang_name on Reference attribute %q has no effect (Reference attrs excluded from body)", newAttr.TfName)
+					}
+					if result[i].Id && (result[i].AddedInVersion != "" || result[i].RemovedInVersion != "") {
+						log.Fatalf("attribute %q: replaces_yang_name on a key attribute (id: true) cannot be combined with AddedInVersion or RemovedInVersion — these code paths are not reconciled in the template", result[i].TfName)
 					}
 					if result[i].VersionYangNames == nil {
 						result[i].VersionYangNames = make(map[string]string)

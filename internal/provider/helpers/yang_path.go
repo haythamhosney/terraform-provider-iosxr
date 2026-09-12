@@ -18,12 +18,12 @@
 package helpers
 
 // SelectYangPath returns the correct gNMI JSON path for the given device version.
-// newPath is used for versions >= movedInVersion; oldPath for older versions.
-// When version is empty (unknown), oldPath is returned as the safe fallback —
-// VersionAtLeast("", x) returns true, so we guard against that explicitly.
-func SelectYangPath(version, newPath, oldPath, movedInVersion string) string {
-	if version != "" && VersionAtLeast(version, movedInVersion) {
-		return newPath
+// versionPaths maps version thresholds to YANG paths; the highest threshold that
+// satisfies VersionAtLeast(version, threshold) wins. Falls back to defaultPath when
+// version is empty or below all thresholds.
+func SelectYangPath(version string, versionPaths map[string]string, defaultPath string) string {
+	if version == "" {
+		return defaultPath
 	}
-	return oldPath
+	return GetPathVersion(version, defaultPath, versionPaths)
 }

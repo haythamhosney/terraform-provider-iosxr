@@ -399,6 +399,53 @@ func TestMergeAttributes_ReplacesYangName_OnKeyAttr(t *testing.T) {
 	}
 }
 
+func TestMergeAttributes_ReplacesYangName_ThreeVersionChain(t *testing.T) {
+	// Simulates an attribute that moves in 25.4 and again in 26.2.
+	// Each delta points replaces_yang_name at the previous canonical yang_name.
+	base := []YamlConfigAttribute{
+		{YangName: "monitor", TfName: "monitor", Type: "String"},
+	}
+	// First move: 24.4 "monitor" → 25.4 "monitor/monitor-level"
+	after25 := mergeAttributes(base, []YamlConfigAttribute{
+		{YangName: "monitor/monitor-level", TfName: "monitor", Type: "String", ReplacesYangName: "monitor"},
+	}, "25.4")
+
+	// Second move: current canonical "monitor/monitor-level" → 26.2 "monitor/monitor-level/mode"
+	after26 := mergeAttributes(after25, []YamlConfigAttribute{
+		{YangName: "monitor/monitor-level/mode", TfName: "monitor", Type: "String", ReplacesYangName: "monitor/monitor-level"},
+	}, "26.2")
+
+	if len(after26) != 1 {
+		t.Fatalf("len: got %d, want 1", len(after26))
+	}
+	attr := after26[0]
+	if attr.YangName != "monitor/monitor-level/mode" {
+		t.Errorf("YangName: got %q, want %q", attr.YangName, "monitor/monitor-level/mode")
+	}
+	if attr.VersionYangNames["_base"] != "monitor" {
+		t.Errorf("VersionYangNames[_base]: got %q, want %q", attr.VersionYangNames["_base"], "monitor")
+	}
+	if attr.VersionYangNames["25.4"] != "monitor/monitor-level" {
+		t.Errorf("VersionYangNames[25.4]: got %q, want %q", attr.VersionYangNames["25.4"], "monitor/monitor-level")
+	}
+	if attr.VersionYangNames["26.2"] != "monitor/monitor-level/mode" {
+		t.Errorf("VersionYangNames[26.2]: got %q, want %q", attr.VersionYangNames["26.2"], "monitor/monitor-level/mode")
+	}
+
+	// After fixAttributeBaseVersion, "_base" → "24.4" and MovedInVersion is the earliest move.
+	fixAttributeBaseVersion(&attr, "24.4")
+	if attr.VersionYangNames["24.4"] != "monitor" {
+		t.Errorf("VersionYangNames[24.4]: got %q, want %q", attr.VersionYangNames["24.4"], "monitor")
+	}
+	if _, hasBase := attr.VersionYangNames["_base"]; hasBase {
+		t.Error("VersionYangNames[_base]: still present after fixAttributeBaseVersion, want removed")
+	}
+	// MovedInVersion is the earliest non-base version key ("25.4" < "26.2").
+	if attr.MovedInVersion != "25.4" {
+		t.Errorf("MovedInVersion: got %q, want %q", attr.MovedInVersion, "25.4")
+	}
+}
+
 // ---------------------------------------------------------------------------
 // TODO (F4a): Add GetPathVersion tests in internal/provider/helpers/version_path_test.go
 // when helpers.GetPathVersion is implemented. Test cases to cover:

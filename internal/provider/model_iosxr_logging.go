@@ -227,34 +227,34 @@ func (data LoggingData) getPath() string {
 func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 	body := "{}"
 	if !data.Console.IsNull() && !data.Console.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "console.console-level", "console", "25.4"), data.Console.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "console", "25.4": "console.console-level"}, "console"), data.Console.ValueString())
 	}
 	if !data.Trap.IsNull() && !data.Trap.IsUnknown() {
 		body, _ = sjson.Set(body, "trap", data.Trap.ValueString())
 	}
 	if !data.Monitor.IsNull() && !data.Monitor.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.monitor-level", "monitor", "25.4"), data.Monitor.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "monitor", "25.4": "monitor.monitor-level"}, "monitor"), data.Monitor.ValueString())
 	}
 	if !data.ConsoleFacility.IsNull() && !data.ConsoleFacility.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "console.facility.all", "console-logging.console-log-facility.console-facility-level", "25.4"), data.ConsoleFacility.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "console-logging.console-log-facility.console-facility-level", "25.4": "console.facility.all"}, "console-logging.console-log-facility.console-facility-level"), data.ConsoleFacility.ValueString())
 	}
 	if !data.MonitorDiscriminatorMatch1.IsNull() && !data.MonitorDiscriminatorMatch1.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4"), data.MonitorDiscriminatorMatch1.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "monitor-discriminator.match1", "25.4": "monitor.discriminator.match1"}, "monitor-discriminator.match1"), data.MonitorDiscriminatorMatch1.ValueString())
 	}
 	if !data.MonitorDiscriminatorMatch2.IsNull() && !data.MonitorDiscriminatorMatch2.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.match2", "monitor-discriminator.match2", "25.4"), data.MonitorDiscriminatorMatch2.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "monitor-discriminator.match2", "25.4": "monitor.discriminator.match2"}, "monitor-discriminator.match2"), data.MonitorDiscriminatorMatch2.ValueString())
 	}
 	if !data.MonitorDiscriminatorMatch3.IsNull() && !data.MonitorDiscriminatorMatch3.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.match3", "monitor-discriminator.match3", "25.4"), data.MonitorDiscriminatorMatch3.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "monitor-discriminator.match3", "25.4": "monitor.discriminator.match3"}, "monitor-discriminator.match3"), data.MonitorDiscriminatorMatch3.ValueString())
 	}
 	if !data.MonitorDiscriminatorNomatch1.IsNull() && !data.MonitorDiscriminatorNomatch1.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.nomatch1", "monitor-discriminator.nomatch1", "25.4"), data.MonitorDiscriminatorNomatch1.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "monitor-discriminator.nomatch1", "25.4": "monitor.discriminator.nomatch1"}, "monitor-discriminator.nomatch1"), data.MonitorDiscriminatorNomatch1.ValueString())
 	}
 	if !data.MonitorDiscriminatorNomatch2.IsNull() && !data.MonitorDiscriminatorNomatch2.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.nomatch2", "monitor-discriminator.nomatch2", "25.4"), data.MonitorDiscriminatorNomatch2.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "monitor-discriminator.nomatch2", "25.4": "monitor.discriminator.nomatch2"}, "monitor-discriminator.nomatch2"), data.MonitorDiscriminatorNomatch2.ValueString())
 	}
 	if !data.MonitorDiscriminatorNomatch3.IsNull() && !data.MonitorDiscriminatorNomatch3.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "monitor.discriminator.nomatch3", "monitor-discriminator.nomatch3", "25.4"), data.MonitorDiscriminatorNomatch3.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "monitor-discriminator.nomatch3", "25.4": "monitor.discriminator.nomatch3"}, "monitor-discriminator.nomatch3"), data.MonitorDiscriminatorNomatch3.ValueString())
 	}
 	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
 		if !data.ArchiveDisk0.IsNull() && !data.ArchiveDisk0.IsUnknown() {
@@ -342,13 +342,13 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 		}
 	}
 	if !data.BufferedEntriesCount.IsNull() && !data.BufferedEntriesCount.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "buffered.entries-count", "buffered.buffered-entries.count", "25.4"), strconv.FormatInt(data.BufferedEntriesCount.ValueInt64(), 10))
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "buffered.buffered-entries.count", "25.4": "buffered.entries-count"}, "buffered.buffered-entries.count"), strconv.FormatInt(data.BufferedEntriesCount.ValueInt64(), 10))
 	}
 	if !data.BufferedSize.IsNull() && !data.BufferedSize.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "buffered.log-buffer-size", "buffered.logging-buffer-size", "25.4"), strconv.FormatInt(data.BufferedSize.ValueInt64(), 10))
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "buffered.logging-buffer-size", "25.4": "buffered.log-buffer-size"}, "buffered.logging-buffer-size"), strconv.FormatInt(data.BufferedSize.ValueInt64(), 10))
 	}
 	if !data.BufferedLevel.IsNull() && !data.BufferedLevel.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "buffered.buffered-level", "buffered.level", "25.4"), data.BufferedLevel.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "buffered.level", "25.4": "buffered.buffered-level"}, "buffered.level"), data.BufferedLevel.ValueString())
 	}
 	if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
 		if !data.BufferedDiscriminatorMatch1.IsNull() && !data.BufferedDiscriminatorMatch1.IsUnknown() {
@@ -395,10 +395,10 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 		}
 	}
 	if !data.History.IsNull() && !data.History.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "history.level", "history", "25.4"), data.History.ValueString())
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "history", "25.4": "history.level"}, "history"), data.History.ValueString())
 	}
 	if !data.HistorySize.IsNull() && !data.HistorySize.IsUnknown() {
-		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, "history.size", "history-size", "25.4"), strconv.FormatInt(data.HistorySize.ValueInt64(), 10))
+		body, _ = sjson.Set(body, helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "history-size", "25.4": "history.size"}, "history-size"), strconv.FormatInt(data.HistorySize.ValueInt64(), 10))
 	}
 	if !data.Hostnameprefix.IsNull() && !data.Hostnameprefix.IsUnknown() {
 		body, _ = sjson.Set(body, "hostnameprefix", data.Hostnameprefix.ValueString())
@@ -489,28 +489,26 @@ func (data Logging) toBody(ctx context.Context, providerVersion string) string {
 				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"file-name", item.FileName.ValueString())
 			}
 			if !item.Path.IsNull() && !item.Path.IsUnknown() {
-				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.path-name", "path", "25.4"), item.Path.ValueString())
+				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "path", "25.4": "path.path-name"}, "path"), item.Path.ValueString())
 			}
 			if !item.Maxfilesize.IsNull() && !item.Maxfilesize.IsUnknown() {
-				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.maxfilesize", "maxfilesize", "25.4"), strconv.FormatInt(item.Maxfilesize.ValueInt64(), 10))
+				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "maxfilesize", "25.4": "path.maxfilesize"}, "maxfilesize"), strconv.FormatInt(item.Maxfilesize.ValueInt64(), 10))
 			}
 			if !item.Severity.IsNull() && !item.Severity.IsUnknown() {
-				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.severity", "severity", "25.4"), item.Severity.ValueString())
+				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "severity", "25.4": "path.severity"}, "severity"), item.Severity.ValueString())
 			}
 			if !item.LocalAccounting.IsNull() && !item.LocalAccounting.IsUnknown() {
 				if item.LocalAccounting.ValueBool() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.local-accounting", "local-accounting", "25.4"), map[string]string{})
+					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "local-accounting", "25.4": "path.local-accounting"}, "local-accounting"), map[string]string{})
 				}
 			}
 			if !item.LocalAccountingSendToRemote.IsNull() && !item.LocalAccountingSendToRemote.IsUnknown() {
 				if item.LocalAccountingSendToRemote.ValueBool() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4"), map[string]string{})
+					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "local-accounting.send-to-remote", "25.4": "path.local-accounting.send-to-remote"}, "local-accounting.send-to-remote"), map[string]string{})
 				}
 			}
-			if providerVersion == "" || !helpers.VersionAtLeast(providerVersion, "25.4") {
-				if !item.LocalAccountingSendToRemoteFacilityLevel.IsNull() && !item.LocalAccountingSendToRemoteFacilityLevel.IsUnknown() {
-					body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"path.local-accounting.send-to-remote.facility", item.LocalAccountingSendToRemoteFacilityLevel.ValueString())
-				}
+			if !item.LocalAccountingSendToRemoteFacilityLevel.IsNull() && !item.LocalAccountingSendToRemoteFacilityLevel.IsUnknown() {
+				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+helpers.SelectYangPath(providerVersion, map[string]string{"24.4": "local-accounting.send-to-remote.facility.level", "25.4": "path.local-accounting.send-to-remote.facility"}, "local-accounting.send-to-remote.facility.level"), item.LocalAccountingSendToRemoteFacilityLevel.ValueString())
 			}
 			if !item.DiscriminatorMatch1.IsNull() && !item.DiscriminatorMatch1.IsUnknown() {
 				body, _ = sjson.Set(body, "files.file"+"."+strconv.Itoa(index)+"."+"discriminator.match1", item.DiscriminatorMatch1.ValueString())
@@ -736,11 +734,6 @@ func (data Logging) GetVersionConstraints() []helpers.FieldVersionConstraint {
 			RemovedInVersion: "25.4",
 		},
 		{
-			FieldPath: "file.local_accounting_send_to_remote_facility_level",
-
-			RemovedInVersion: "25.4",
-		},
-		{
 			FieldPath: "source_interfaces.name",
 
 			RemovedInVersion: "25.4",
@@ -875,7 +868,7 @@ func (data Logging) GetPatternConstraints() []helpers.FieldPatternConstraint {
 
 // Section below is generated&owned by "gen/generator.go". //template:begin updateFromBody
 func (data *Logging) updateFromBody(ctx context.Context, res []byte, version string) {
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.console-level", "console", "25.4")); value.Exists() && value.Type == gjson.String && !data.Console.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "console", "25.4": "console.console-level"}, "console")); value.Exists() && value.Type == gjson.String && !data.Console.IsNull() {
 		data.Console = types.StringValue(value.String())
 	} else {
 		data.Console = types.StringNull()
@@ -885,42 +878,42 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 	} else {
 		data.Trap = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.monitor-level", "monitor", "25.4")); value.Exists() && value.Type == gjson.String && !data.Monitor.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor", "25.4": "monitor.monitor-level"}, "monitor")); value.Exists() && value.Type == gjson.String && !data.Monitor.IsNull() {
 		data.Monitor = types.StringValue(value.String())
 	} else {
 		data.Monitor = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.facility.all", "console-logging.console-log-facility.console-facility-level", "25.4")); value.Exists() && value.Type == gjson.String && !data.ConsoleFacility.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "console-logging.console-log-facility.console-facility-level", "25.4": "console.facility.all"}, "console-logging.console-log-facility.console-facility-level")); value.Exists() && value.Type == gjson.String && !data.ConsoleFacility.IsNull() {
 		data.ConsoleFacility = types.StringValue(value.String())
 	} else {
 		data.ConsoleFacility = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch1.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.match1", "25.4": "monitor.discriminator.match1"}, "monitor-discriminator.match1")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch1.IsNull() {
 		data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorMatch1 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match2", "monitor-discriminator.match2", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch2.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.match2", "25.4": "monitor.discriminator.match2"}, "monitor-discriminator.match2")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch2.IsNull() {
 		data.MonitorDiscriminatorMatch2 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorMatch2 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match3", "monitor-discriminator.match3", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch3.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.match3", "25.4": "monitor.discriminator.match3"}, "monitor-discriminator.match3")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorMatch3.IsNull() {
 		data.MonitorDiscriminatorMatch3 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorMatch3 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch1", "monitor-discriminator.nomatch1", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch1.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.nomatch1", "25.4": "monitor.discriminator.nomatch1"}, "monitor-discriminator.nomatch1")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch1.IsNull() {
 		data.MonitorDiscriminatorNomatch1 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorNomatch1 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch2", "monitor-discriminator.nomatch2", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch2.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.nomatch2", "25.4": "monitor.discriminator.nomatch2"}, "monitor-discriminator.nomatch2")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch2.IsNull() {
 		data.MonitorDiscriminatorNomatch2 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorNomatch2 = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch3", "monitor-discriminator.nomatch3", "25.4")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch3.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.nomatch3", "25.4": "monitor.discriminator.nomatch3"}, "monitor-discriminator.nomatch3")); value.Exists() && value.Type == gjson.String && !data.MonitorDiscriminatorNomatch3.IsNull() {
 		data.MonitorDiscriminatorNomatch3 = types.StringValue(value.String())
 	} else {
 		data.MonitorDiscriminatorNomatch3 = types.StringNull()
@@ -1020,17 +1013,17 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 	} else {
 		data.FacilityLevel = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.entries-count", "buffered.buffered-entries.count", "25.4")); value.Exists() && value.Type == gjson.Number && !data.BufferedEntriesCount.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "buffered.buffered-entries.count", "25.4": "buffered.entries-count"}, "buffered.buffered-entries.count")); value.Exists() && value.Type == gjson.Number && !data.BufferedEntriesCount.IsNull() {
 		data.BufferedEntriesCount = types.Int64Value(value.Int())
 	} else {
 		data.BufferedEntriesCount = types.Int64Null()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.log-buffer-size", "buffered.logging-buffer-size", "25.4")); value.Exists() && value.Type == gjson.Number && !data.BufferedSize.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "buffered.logging-buffer-size", "25.4": "buffered.log-buffer-size"}, "buffered.logging-buffer-size")); value.Exists() && value.Type == gjson.Number && !data.BufferedSize.IsNull() {
 		data.BufferedSize = types.Int64Value(value.Int())
 	} else {
 		data.BufferedSize = types.Int64Null()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.buffered-level", "buffered.level", "25.4")); value.Exists() && value.Type == gjson.String && !data.BufferedLevel.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "buffered.level", "25.4": "buffered.buffered-level"}, "buffered.level")); value.Exists() && value.Type == gjson.String && !data.BufferedLevel.IsNull() {
 		data.BufferedLevel = types.StringValue(value.String())
 	} else {
 		data.BufferedLevel = types.StringNull()
@@ -1111,22 +1104,22 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 		} else {
 			data.File[i].FileName = types.StringNull()
 		}
-		if value := r.Get(helpers.SelectYangPath(version, "path.path-name", "path", "25.4")); value.Exists() && value.Type == gjson.String && !data.File[i].Path.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "path", "25.4": "path.path-name"}, "path")); value.Exists() && value.Type == gjson.String && !data.File[i].Path.IsNull() {
 			data.File[i].Path = types.StringValue(value.String())
 		} else {
 			data.File[i].Path = types.StringNull()
 		}
-		if value := r.Get(helpers.SelectYangPath(version, "path.maxfilesize", "maxfilesize", "25.4")); value.Exists() && value.Type == gjson.Number && !data.File[i].Maxfilesize.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "maxfilesize", "25.4": "path.maxfilesize"}, "maxfilesize")); value.Exists() && value.Type == gjson.Number && !data.File[i].Maxfilesize.IsNull() {
 			data.File[i].Maxfilesize = types.Int64Value(value.Int())
 		} else {
 			data.File[i].Maxfilesize = types.Int64Null()
 		}
-		if value := r.Get(helpers.SelectYangPath(version, "path.severity", "severity", "25.4")); value.Exists() && value.Type == gjson.String && !data.File[i].Severity.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "severity", "25.4": "path.severity"}, "severity")); value.Exists() && value.Type == gjson.String && !data.File[i].Severity.IsNull() {
 			data.File[i].Severity = types.StringValue(value.String())
 		} else {
 			data.File[i].Severity = types.StringNull()
 		}
-		if value := r.Get(helpers.SelectYangPath(version, "path.local-accounting", "local-accounting", "25.4")); !data.File[i].LocalAccounting.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "local-accounting", "25.4": "path.local-accounting"}, "local-accounting")); !data.File[i].LocalAccounting.IsNull() {
 			if value.Exists() {
 				data.File[i].LocalAccounting = types.BoolValue(true)
 			} else {
@@ -1135,7 +1128,7 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 		} else {
 			data.File[i].LocalAccounting = types.BoolNull()
 		}
-		if value := r.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); !data.File[i].LocalAccountingSendToRemote.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "local-accounting.send-to-remote", "25.4": "path.local-accounting.send-to-remote"}, "local-accounting.send-to-remote")); !data.File[i].LocalAccountingSendToRemote.IsNull() {
 			if value.Exists() {
 				data.File[i].LocalAccountingSendToRemote = types.BoolValue(true)
 			} else {
@@ -1144,7 +1137,7 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 		} else {
 			data.File[i].LocalAccountingSendToRemote = types.BoolNull()
 		}
-		if value := r.Get("path.local-accounting.send-to-remote.facility"); (version == "" || !helpers.VersionAtLeast(version, "25.4")) && value.Exists() && value.Type == gjson.String && !data.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
+		if value := r.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "local-accounting.send-to-remote.facility.level", "25.4": "path.local-accounting.send-to-remote.facility"}, "local-accounting.send-to-remote.facility.level")); value.Exists() && value.Type == gjson.String && !data.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
 			data.File[i].LocalAccountingSendToRemoteFacilityLevel = types.StringValue(value.String())
 		} else {
 			data.File[i].LocalAccountingSendToRemoteFacilityLevel = types.StringNull()
@@ -1180,12 +1173,12 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 			data.File[i].DiscriminatorNomatch3 = types.StringNull()
 		}
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.level", "history", "25.4")); value.Exists() && value.Type == gjson.String && !data.History.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "history", "25.4": "history.level"}, "history")); value.Exists() && value.Type == gjson.String && !data.History.IsNull() {
 		data.History = types.StringValue(value.String())
 	} else {
 		data.History = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.size", "history-size", "25.4")); value.Exists() && value.Type == gjson.Number && !data.HistorySize.IsNull() {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "history-size", "25.4": "history.size"}, "history-size")); value.Exists() && value.Type == gjson.Number && !data.HistorySize.IsNull() {
 		data.HistorySize = types.Int64Value(value.Int())
 	} else {
 		data.HistorySize = types.Int64Null()
@@ -1527,34 +1520,34 @@ func (data *Logging) updateFromBody(ctx context.Context, res []byte, version str
 // Section below is generated&owned by "gen/generator.go". //template:begin fromBody
 
 func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.console-level", "console", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "console", "25.4": "console.console-level"}, "console")); value.Exists() && value.Type == gjson.String {
 		data.Console = types.StringValue(value.String())
 	}
 	if value := gjson.GetBytes(res, "trap"); value.Exists() && value.Type == gjson.String {
 		data.Trap = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.monitor-level", "monitor", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor", "25.4": "monitor.monitor-level"}, "monitor")); value.Exists() && value.Type == gjson.String {
 		data.Monitor = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.facility.all", "console-logging.console-log-facility.console-facility-level", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "console-logging.console-log-facility.console-facility-level", "25.4": "console.facility.all"}, "console-logging.console-log-facility.console-facility-level")); value.Exists() && value.Type == gjson.String {
 		data.ConsoleFacility = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.match1", "25.4": "monitor.discriminator.match1"}, "monitor-discriminator.match1")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match2", "monitor-discriminator.match2", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.match2", "25.4": "monitor.discriminator.match2"}, "monitor-discriminator.match2")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorMatch2 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match3", "monitor-discriminator.match3", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.match3", "25.4": "monitor.discriminator.match3"}, "monitor-discriminator.match3")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorMatch3 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch1", "monitor-discriminator.nomatch1", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.nomatch1", "25.4": "monitor.discriminator.nomatch1"}, "monitor-discriminator.nomatch1")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorNomatch1 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch2", "monitor-discriminator.nomatch2", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.nomatch2", "25.4": "monitor.discriminator.nomatch2"}, "monitor-discriminator.nomatch2")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorNomatch2 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch3", "monitor-discriminator.nomatch3", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.nomatch3", "25.4": "monitor.discriminator.nomatch3"}, "monitor-discriminator.nomatch3")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorNomatch3 = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
@@ -1672,13 +1665,13 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 	} else {
 		data.FacilityLevel = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.entries-count", "buffered.buffered-entries.count", "25.4")); value.Exists() && value.Type == gjson.Number {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "buffered.buffered-entries.count", "25.4": "buffered.entries-count"}, "buffered.buffered-entries.count")); value.Exists() && value.Type == gjson.Number {
 		data.BufferedEntriesCount = types.Int64Value(value.Int())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.log-buffer-size", "buffered.logging-buffer-size", "25.4")); value.Exists() && value.Type == gjson.Number {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "buffered.logging-buffer-size", "25.4": "buffered.log-buffer-size"}, "buffered.logging-buffer-size")); value.Exists() && value.Type == gjson.Number {
 		data.BufferedSize = types.Int64Value(value.Int())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.buffered-level", "buffered.level", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "buffered.level", "25.4": "buffered.buffered-level"}, "buffered.level")); value.Exists() && value.Type == gjson.String {
 		data.BufferedLevel = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
@@ -1748,31 +1741,27 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 			if cValue := v.Get("file-name"); cValue.Exists() && cValue.Type == gjson.String {
 				item.FileName = types.StringValue(cValue.String())
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.path-name", "path", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "path", "25.4": "path.path-name"}, "path")); cValue.Exists() && cValue.Type == gjson.String {
 				item.Path = types.StringValue(cValue.String())
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.maxfilesize", "maxfilesize", "25.4")); cValue.Exists() && cValue.Type == gjson.Number {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "maxfilesize", "25.4": "path.maxfilesize"}, "maxfilesize")); cValue.Exists() && cValue.Type == gjson.Number {
 				item.Maxfilesize = types.Int64Value(cValue.Int())
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.severity", "severity", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "severity", "25.4": "path.severity"}, "severity")); cValue.Exists() && cValue.Type == gjson.String {
 				item.Severity = types.StringValue(cValue.String())
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting", "local-accounting", "25.4")); cValue.Exists() {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "local-accounting", "25.4": "path.local-accounting"}, "local-accounting")); cValue.Exists() {
 				item.LocalAccounting = types.BoolValue(true)
 			} else {
 				item.LocalAccounting = types.BoolValue(false)
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); cValue.Exists() {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "local-accounting.send-to-remote", "25.4": "path.local-accounting.send-to-remote"}, "local-accounting.send-to-remote")); cValue.Exists() {
 				item.LocalAccountingSendToRemote = types.BoolValue(true)
 			} else {
 				item.LocalAccountingSendToRemote = types.BoolValue(false)
 			}
-			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.local-accounting.send-to-remote.facility"); cValue.Exists() && cValue.Type == gjson.String {
-					item.LocalAccountingSendToRemoteFacilityLevel = types.StringValue(cValue.String())
-				}
-			} else {
-				item.LocalAccountingSendToRemoteFacilityLevel = types.StringNull()
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "local-accounting.send-to-remote.facility.level", "25.4": "path.local-accounting.send-to-remote.facility"}, "local-accounting.send-to-remote.facility.level")); cValue.Exists() && cValue.Type == gjson.String {
+				item.LocalAccountingSendToRemoteFacilityLevel = types.StringValue(cValue.String())
 			}
 			if cValue := v.Get("discriminator.match1"); cValue.Exists() && cValue.Type == gjson.String {
 				item.DiscriminatorMatch1 = types.StringValue(cValue.String())
@@ -1796,10 +1785,10 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 			return true
 		})
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.level", "history", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "history", "25.4": "history.level"}, "history")); value.Exists() && value.Type == gjson.String {
 		data.History = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.size", "history-size", "25.4")); value.Exists() && value.Type == gjson.Number {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "history-size", "25.4": "history.size"}, "history-size")); value.Exists() && value.Type == gjson.Number {
 		data.HistorySize = types.Int64Value(value.Int())
 	}
 	if value := gjson.GetBytes(res, "hostnameprefix"); value.Exists() && value.Type == gjson.String {
@@ -2011,34 +2000,34 @@ func (data *Logging) fromBody(ctx context.Context, res []byte, version string) {
 // Section below is generated&owned by "gen/generator.go". //template:begin fromBodyData
 
 func (data *LoggingData) fromBody(ctx context.Context, res []byte, version string) {
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.console-level", "console", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "console", "25.4": "console.console-level"}, "console")); value.Exists() && value.Type == gjson.String {
 		data.Console = types.StringValue(value.String())
 	}
 	if value := gjson.GetBytes(res, "trap"); value.Exists() && value.Type == gjson.String {
 		data.Trap = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.monitor-level", "monitor", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor", "25.4": "monitor.monitor-level"}, "monitor")); value.Exists() && value.Type == gjson.String {
 		data.Monitor = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "console.facility.all", "console-logging.console-log-facility.console-facility-level", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "console-logging.console-log-facility.console-facility-level", "25.4": "console.facility.all"}, "console-logging.console-log-facility.console-facility-level")); value.Exists() && value.Type == gjson.String {
 		data.ConsoleFacility = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match1", "monitor-discriminator.match1", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.match1", "25.4": "monitor.discriminator.match1"}, "monitor-discriminator.match1")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorMatch1 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match2", "monitor-discriminator.match2", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.match2", "25.4": "monitor.discriminator.match2"}, "monitor-discriminator.match2")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorMatch2 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.match3", "monitor-discriminator.match3", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.match3", "25.4": "monitor.discriminator.match3"}, "monitor-discriminator.match3")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorMatch3 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch1", "monitor-discriminator.nomatch1", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.nomatch1", "25.4": "monitor.discriminator.nomatch1"}, "monitor-discriminator.nomatch1")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorNomatch1 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch2", "monitor-discriminator.nomatch2", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.nomatch2", "25.4": "monitor.discriminator.nomatch2"}, "monitor-discriminator.nomatch2")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorNomatch2 = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "monitor.discriminator.nomatch3", "monitor-discriminator.nomatch3", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "monitor-discriminator.nomatch3", "25.4": "monitor.discriminator.nomatch3"}, "monitor-discriminator.nomatch3")); value.Exists() && value.Type == gjson.String {
 		data.MonitorDiscriminatorNomatch3 = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
@@ -2156,13 +2145,13 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 	} else {
 		data.FacilityLevel = types.StringNull()
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.entries-count", "buffered.buffered-entries.count", "25.4")); value.Exists() && value.Type == gjson.Number {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "buffered.buffered-entries.count", "25.4": "buffered.entries-count"}, "buffered.buffered-entries.count")); value.Exists() && value.Type == gjson.Number {
 		data.BufferedEntriesCount = types.Int64Value(value.Int())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.log-buffer-size", "buffered.logging-buffer-size", "25.4")); value.Exists() && value.Type == gjson.Number {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "buffered.logging-buffer-size", "25.4": "buffered.log-buffer-size"}, "buffered.logging-buffer-size")); value.Exists() && value.Type == gjson.Number {
 		data.BufferedSize = types.Int64Value(value.Int())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "buffered.buffered-level", "buffered.level", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "buffered.level", "25.4": "buffered.buffered-level"}, "buffered.level")); value.Exists() && value.Type == gjson.String {
 		data.BufferedLevel = types.StringValue(value.String())
 	}
 	if version == "" || !helpers.VersionAtLeast(version, "25.4") {
@@ -2232,31 +2221,27 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 			if cValue := v.Get("file-name"); cValue.Exists() && cValue.Type == gjson.String {
 				item.FileName = types.StringValue(cValue.String())
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.path-name", "path", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "path", "25.4": "path.path-name"}, "path")); cValue.Exists() && cValue.Type == gjson.String {
 				item.Path = types.StringValue(cValue.String())
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.maxfilesize", "maxfilesize", "25.4")); cValue.Exists() && cValue.Type == gjson.Number {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "maxfilesize", "25.4": "path.maxfilesize"}, "maxfilesize")); cValue.Exists() && cValue.Type == gjson.Number {
 				item.Maxfilesize = types.Int64Value(cValue.Int())
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.severity", "severity", "25.4")); cValue.Exists() && cValue.Type == gjson.String {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "severity", "25.4": "path.severity"}, "severity")); cValue.Exists() && cValue.Type == gjson.String {
 				item.Severity = types.StringValue(cValue.String())
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting", "local-accounting", "25.4")); cValue.Exists() {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "local-accounting", "25.4": "path.local-accounting"}, "local-accounting")); cValue.Exists() {
 				item.LocalAccounting = types.BoolValue(true)
 			} else {
 				item.LocalAccounting = types.BoolValue(false)
 			}
-			if cValue := v.Get(helpers.SelectYangPath(version, "path.local-accounting.send-to-remote", "local-accounting.send-to-remote", "25.4")); cValue.Exists() {
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "local-accounting.send-to-remote", "25.4": "path.local-accounting.send-to-remote"}, "local-accounting.send-to-remote")); cValue.Exists() {
 				item.LocalAccountingSendToRemote = types.BoolValue(true)
 			} else {
 				item.LocalAccountingSendToRemote = types.BoolValue(false)
 			}
-			if version == "" || !helpers.VersionAtLeast(version, "25.4") {
-				if cValue := v.Get("path.local-accounting.send-to-remote.facility"); cValue.Exists() && cValue.Type == gjson.String {
-					item.LocalAccountingSendToRemoteFacilityLevel = types.StringValue(cValue.String())
-				}
-			} else {
-				item.LocalAccountingSendToRemoteFacilityLevel = types.StringNull()
+			if cValue := v.Get(helpers.SelectYangPath(version, map[string]string{"24.4": "local-accounting.send-to-remote.facility.level", "25.4": "path.local-accounting.send-to-remote.facility"}, "local-accounting.send-to-remote.facility.level")); cValue.Exists() && cValue.Type == gjson.String {
+				item.LocalAccountingSendToRemoteFacilityLevel = types.StringValue(cValue.String())
 			}
 			if cValue := v.Get("discriminator.match1"); cValue.Exists() && cValue.Type == gjson.String {
 				item.DiscriminatorMatch1 = types.StringValue(cValue.String())
@@ -2280,10 +2265,10 @@ func (data *LoggingData) fromBody(ctx context.Context, res []byte, version strin
 			return true
 		})
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.level", "history", "25.4")); value.Exists() && value.Type == gjson.String {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "history", "25.4": "history.level"}, "history")); value.Exists() && value.Type == gjson.String {
 		data.History = types.StringValue(value.String())
 	}
-	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, "history.size", "history-size", "25.4")); value.Exists() && value.Type == gjson.Number {
+	if value := gjson.GetBytes(res, helpers.SelectYangPath(version, map[string]string{"24.4": "history-size", "25.4": "history.size"}, "history-size")); value.Exists() && value.Type == gjson.Number {
 		data.HistorySize = types.Int64Value(value.Int())
 	}
 	if value := gjson.GetBytes(res, "hostnameprefix"); value.Exists() && value.Type == gjson.String {
@@ -2821,7 +2806,7 @@ func (data *Logging) getDeletedItems(ctx context.Context, state Logging, version
 				if !state.File[i].DiscriminatorMatch1.IsNull() && data.File[j].DiscriminatorMatch1.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/discriminator/match1", state.getPath(), keyString))
 				}
-				if (version == "" || !helpers.VersionAtLeast(version, "25.4")) && !state.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() && data.File[j].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
+				if !state.File[i].LocalAccountingSendToRemoteFacilityLevel.IsNull() && data.File[j].LocalAccountingSendToRemoteFacilityLevel.IsNull() {
 					deletedItems = append(deletedItems, fmt.Sprintf("%v/files/file%v/path/local-accounting/send-to-remote/facility", state.getPath(), keyString))
 				}
 				if !state.File[i].LocalAccountingSendToRemote.IsNull() && data.File[j].LocalAccountingSendToRemote.IsNull() {

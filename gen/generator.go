@@ -261,18 +261,40 @@ func ToJsonPath(yangPath, xPath string) string {
 	return strings.Join(parts, ".")
 }
 
+// sortedVersionKeys returns the keys of m sorted in ascending version order.
+// Used to produce deterministic map literals in generated code.
+func sortedVersionKeys(m map[string]string) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		return versionCompare(keys[i], keys[j]) < 0
+	})
+	return keys
+}
+
 // JsonPathExpr returns a Go expression string for the gNMI JSON path of an attribute.
 // For static attributes it returns a quoted string literal (e.g. "files.file").
 // For attributes with a renamed YANG path it returns a helpers.SelectYangPath(...) call
-// so the correct path is chosen at runtime based on the device version.
+// with a map[string]string of version thresholds so any number of moves is handled.
 func JsonPathExpr(attr YamlConfigAttribute, versionVar string) string {
 	path := ToJsonPath(attr.YangName, attr.XPath)
 	if len(attr.VersionYangNames) == 0 {
 		return fmt.Sprintf("%q", path)
 	}
-	old := ToJsonPath(attr.ReplacesYangName, attr.ReplacesXPath)
-	return fmt.Sprintf(`helpers.SelectYangPath(%s, %q, %q, %q)`,
-		versionVar, path, old, attr.MovedInVersion)
+	defaultPath := ToJsonPath(attr.ReplacesYangName, attr.ReplacesXPath)
+	var entries []string
+	for _, v := range sortedVersionKeys(attr.VersionYangNames) {
+		yangName := attr.VersionYangNames[v]
+		var xpath string
+		if yangName == attr.ReplacesYangName {
+			xpath = attr.ReplacesXPath
+		}
+		entries = append(entries, fmt.Sprintf("%q: %q", v, ToJsonPath(yangName, xpath)))
+	}
+	return fmt.Sprintf("helpers.SelectYangPath(%s, map[string]string{%s}, %q)",
+		versionVar, strings.Join(entries, ", "), defaultPath)
 }
 
 // KeyPathExpr returns a Go expression string for a list key's YANG path,
@@ -283,9 +305,18 @@ func KeyPathExpr(attr YamlConfigAttribute, versionVar string) string {
 	if len(attr.VersionYangNames) == 0 {
 		return fmt.Sprintf("%q", path)
 	}
-	old := GetXPath(attr.ReplacesYangName, attr.ReplacesXPath)
-	return fmt.Sprintf(`helpers.SelectYangPath(%s, %q, %q, %q)`,
-		versionVar, path, old, attr.MovedInVersion)
+	defaultPath := GetXPath(attr.ReplacesYangName, attr.ReplacesXPath)
+	var entries []string
+	for _, v := range sortedVersionKeys(attr.VersionYangNames) {
+		yangName := attr.VersionYangNames[v]
+		var xpath string
+		if yangName == attr.ReplacesYangName {
+			xpath = attr.ReplacesXPath
+		}
+		entries = append(entries, fmt.Sprintf("%q: %q", v, GetXPath(yangName, xpath)))
+	}
+	return fmt.Sprintf("helpers.SelectYangPath(%s, map[string]string{%s}, %q)",
+		versionVar, strings.Join(entries, ", "), defaultPath)
 }
 
 // Templating helper function to convert string to camel case
